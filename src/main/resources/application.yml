@@ -1,0 +1,182 @@
+server:
+  port: 8080
+  shutdown: graceful
+
+spring:
+  application:
+    name: homework-grader
+  jackson:
+    default-property-inclusion: non_null
+    time-zone: Asia/Shanghai
+    date-format: yyyy-MM-dd HH:mm:ss
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 5000
+      max-lifetime: 1700000
+      pool-name: homeworkHikari
+  # 表结构走 Flyway 版本化，禁止手工改库
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    validate-on-migrate: true
+  data:
+    redis:
+      host: ${REDIS_HOST:127.0.0.1}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      timeout: 3s
+      lettuce:
+        pool:
+          max-active: 16
+          max-idle: 8
+          min-idle: 2
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 60MB
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+  global-config:
+    banner: false
+    db-config:
+      id-type: auto
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+  mapper-locations: classpath*:mapper/**/*.xml
+
+# ---------------------------------------------------------------- 业务配置
+app:
+  cors:
+    # 允许跨域的来源，逗号分隔。留空=完全不开启（生产保持留空）。
+    # 小程序端不受同源策略限制，只有 H5 调试需要填。
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:}
+
+auth:
+  # 登录态是"不透明 token + Redis 映射"，可随时吊销
+  token-ttl: 30d
+  # 开发模式下用这个假 openid 登录，生产必须关闭
+  dev-open-id: dev-openid-local-001
+
+storage:
+  # 用哪个实现：minio / cos / local / auto（auto 按 minio → cos → local 依次取第一个配置好的）
+  provider: ${STORAGE_PROVIDER:auto}
+  # 本地 S3 兼容存储，开发验证用。启动方式见 scripts/start-minio.sh
+  minio:
+    endpoint: ${MINIO_ENDPOINT:}
+    access-key: ${MINIO_ACCESS_KEY:}
+    secret-key: ${MINIO_SECRET_KEY:}
+    bucket: ${MINIO_BUCKET:homework-grader}
+    presign-expire: 30m
+    auto-create-bucket: true
+  # 生产用，接口行为与 MinIO 一致，切换只改 provider
+  cos:
+    secret-id: ${COS_SECRET_ID:}
+    secret-key: ${COS_SECRET_KEY:}
+    # 填完整桶名（含 -APPID 后缀）时 app-id 可留空
+    bucket: ${COS_BUCKET:}
+    region: ${COS_REGION:ap-guangzhou}
+    app-id: ${COS_APP_ID:}
+    # 预签名读的有效期，越短越安全
+    presign-expire: 30m
+    connect-timeout: 10s
+    socket-timeout: 30s
+  # 本地磁盘兜底：COS 凭证还没配好时也能把整条链路跑通，生产请保持 false
+  local-fallback:
+    enabled: ${STORAGE_LOCAL_FALLBACK:false}
+    dir: ./data/files
+    public-base-url: http://127.0.0.1:8080/api/v1/files/raw
+
+wx:
+  miniapp:
+    appid: ${WX_MINIAPP_APPID:}
+    secret: ${WX_MINIAPP_SECRET:}
+    # 允许请求携带 devIdentity 直接登录。仅供本地开发，生产必须 false（开启时启动会告警）
+    dev-login-enabled: ${WX_DEV_LOGIN_ENABLED:false}
+
+grading:
+  # 图片上传给模型前的长边上限。官方会把图缩到约 1300x1300 等效，传更大只是浪费带宽
+  max-long-side: 1600
+  jpeg-quality: 0.85
+  # 低于该置信度视为存疑，UI 上应提示用户核对而不是直接判错
+  low-confidence: 0.7
+  # 是否生成错题的原图裁剪。接了 OCR 定位之后可以打开：拿不到可靠坐标的题目会被自动跳过
+  mistake-crop-enabled: ${GRADING_CROP_ENABLED:false}
+  # 是否允许用"模型自报坐标"裁剪。默认 false —— 那类坐标偏差可达数行，裁出别的题比不裁更糟
+  crop-allow-ai-bbox: ${GRADING_CROP_ALLOW_AI_BBOX:false}
+  # 异步批改线程池
+  executor:
+    core-size: 4
+    max-size: 16
+    queue-capacity: 200
+
+# ---------------------------------------------------------------- 腾讯云 OCR（错题选框）
+ocr:
+  # 总开关。关掉就不调 OCR，错题区域退回模型自报坐标（也就不会生成裁剪图）
+  enabled: ${OCR_ENABLED:true}
+  # 是否用 OCR 行坐标回写题目区域
+  box-enabled: ${OCR_BOX_ENABLED:true}
+  # 默认复用 COS 的同一对子账号密钥（同一 CAM 账号即可），也可单独指定 OCR_SECRET_ID/KEY
+  secret-id: ${OCR_SECRET_ID:${COS_SECRET_ID:}}
+  secret-key: ${OCR_SECRET_KEY:${COS_SECRET_KEY:}}
+  region: ${OCR_REGION:ap-guangzhou}
+  endpoint: ${OCR_ENDPOINT:ocr.tencentcloudapi.com}
+  # GeneralAccurateOCR = 通用文字识别（高精度版）。官方说明它在手写体、小字、模糊字上更准，
+  # 作业照片正属于这类场景。想换手写专用可改成 GeneralHandwritingOCR
+  action: ${OCR_ACTION:GeneralAccurateOCR}
+  version: 2018-11-19
+  # 开启原图切图检测，官方称可提升"整图大但单字符小"（试卷）场景的效果
+  detect-split: ${OCR_DETECT_SPLIT:true}
+  connect-timeout: 10s
+  read-timeout: 30s
+  # 题干与 OCR 行的匹配分低于此值就认为没匹配上，不给框
+  min-match-score: ${OCR_MIN_MATCH_SCORE:0.34}
+  # 单次定位最多包含的连续行数，防止把整页框进去
+  max-lines-per-question: ${OCR_MAX_LINES:8}
+
+deepseek:
+  # 密钥只从环境变量读取，禁止写死在配置文件里
+  api-key: ${DEEPSEEK_API_KEY:}
+  base-url: https://api.deepseek.com
+  # 关键：只有 deepseek-flash 支持图像理解，deepseek-v4-pro 不支持图片输入
+  model: deepseek-flash
+  connect-timeout: 15s
+  read-timeout: 180s
+  max-retries: 2
+  temperature: 0.1
+  # 思考模式会显著推高成本与耗时，且实测未带来准确率收益
+  # 注意：必须显式传 disabled，不传参数等于走服务端默认（开启）
+  thinking:
+    enabled: false
+  reasoning-effort: medium
+
+# ---------------------------------------------------------------- 命令行工具（沿用验证阶段的批改/评测入口）
+demo:
+  images: ""
+  dir: ""
+  subject: math
+  grade: 3
+  mode: grade
+  mock: false
+  out-dir: out
+  exit-after-run: true
+  eval-labels: ""
+  eval-repeat: 3
+  eval-export: ""
+  eval-label-dir: labels
+
+logging:
+  level:
+    com.dxy.homework: DEBUG
+    com.baomidou.mybatisplus: WARN
+  pattern:
+    console: "%d{HH:mm:ss.SSS} %-5level [%X{traceId:-}] %logger{36} - %msg%n"

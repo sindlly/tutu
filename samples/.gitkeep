@@ -1,0 +1,5 @@
+把真实的作业照片放到这个目录（jpg / jpeg / png），然后执行：
+
+  mvn spring-boot:run -Dspring-boot.run.arguments="--demo.dir=samples"
+
+注意：作业照片含未成年人信息，请勿提交到 git（已在 .gitignore 中排除本目录下的图片）。

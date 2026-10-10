@@ -1,0 +1,101 @@
+.index {
+  padding-bottom: 40px;
+}
+
+.hero {
+  padding: 24px 8px 32px;
+}
+
+.hero-title {
+  font-size: 48px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.hero-sub {
+  margin-top: 12px;
+  color: #8c929e;
+  font-size: 26px;
+}
+
+.quota {
+  margin-top: 28px;
+  display: flex;
+  align-items: baseline;
+}
+
+.quota-num {
+  font-size: 72px;
+  font-weight: 700;
+  color: #3b6ef5;
+  line-height: 1;
+}
+
+.quota-label {
+  margin-left: 12px;
+  color: #8c929e;
+  font-size: 26px;
+}
+
+.primary-action {
+  background: linear-gradient(135deg, #4a7bf7, #3b6ef5);
+  border-radius: 24px;
+  padding: 44px 32px;
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(59, 110, 245, 0.25);
+}
+
+.primary-action-icon {
+  font-size: 56px;
+}
+
+.primary-action-main {
+  margin-top: 16px;
+  font-size: 40px;
+  font-weight: 600;
+}
+
+.primary-action-sub {
+  margin-top: 8px;
+  font-size: 24px;
+  opacity: 0.85;
+}
+
+.record {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 0;
+  border-bottom: 2px solid #f0f2f5;
+
+  &:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+}
+
+.record-left {
+  flex: 1;
+  min-width: 0;
+}
+
+.record-title {
+  font-size: 30px;
+  font-weight: 500;
+}
+
+.record-right {
+  margin-left: 20px;
+}
+
+.score {
+  font-size: 40px;
+  font-weight: 700;
+  color: #3b6ef5;
+}
+
+.tips {
+  margin-top: 24px;
+  text-align: center;
+  line-height: 1.6;
+}

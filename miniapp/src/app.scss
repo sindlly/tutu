@@ -1,0 +1,104 @@
+/* 全局样式。页面内尽量用 class，避免行内样式到处散落。 */
+
+page {
+  background: #f5f6f8;
+  color: #1f2329;
+  font-size: 28px;
+  font-family: -apple-system, "PingFang SC", "Helvetica Neue", sans-serif;
+}
+
+.page {
+  min-height: 100vh;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 32px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+}
+
+.row-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.muted {
+  color: #8c929e;
+  font-size: 24px;
+}
+
+.title {
+  font-size: 32px;
+  font-weight: 600;
+}
+
+.mt8 { margin-top: 8px; }
+.mt16 { margin-top: 16px; }
+.mt24 { margin-top: 24px; }
+
+.btn-primary {
+  background: #3b6ef5;
+  color: #fff;
+  border-radius: 16px;
+  font-size: 32px;
+  height: 92px;
+  line-height: 92px;
+  text-align: center;
+
+  &.disabled {
+    background: #c8d0e0;
+  }
+}
+
+.btn-ghost {
+  background: #fff;
+  color: #3b6ef5;
+  border: 2px solid #3b6ef5;
+  border-radius: 16px;
+  font-size: 32px;
+  height: 92px;
+  line-height: 88px;
+  text-align: center;
+}
+
+.tag {
+  display: inline-block;
+  padding: 4px 16px;
+  border-radius: 999px;
+  background: #f0f2f5;
+  color: #8c929e;
+  font-size: 22px;
+  margin-right: 12px;
+}
+
+.tag-wrong {
+  background: #fff1f0;
+  color: #cf1322;
+}
+
+.tag-right {
+  background: #f6ffed;
+  color: #389e0d;
+}
+
+.tag-check {
+  background: #fffbe6;
+  color: #d48806;
+}
+
+.empty {
+  padding: 120px 0;
+  text-align: center;
+  color: #8c929e;
+  font-size: 26px;
+}
