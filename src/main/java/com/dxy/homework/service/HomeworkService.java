@@ -48,6 +48,7 @@ public class HomeworkService {
     private final StorageClient storageClient;
     private final QuotaService quotaService;
     private final GradingPipeline pipeline;
+    private final StudentAccessService accessService;
 
     public HomeworkService(HomeworkCreationService creationService,
                            HomeworkSubmitMapper submitMapper,
@@ -57,8 +58,10 @@ public class HomeworkService {
                            UserMapper userMapper,
                            StorageClient storageClient,
                            QuotaService quotaService,
-                           GradingPipeline pipeline) {
+                           GradingPipeline pipeline,
+                           StudentAccessService accessService) {
         this.creationService = creationService;
+        this.accessService = accessService;
         this.submitMapper = submitMapper;
         this.submitImageMapper = submitImageMapper;
         this.questionMapper = questionMapper;
@@ -128,11 +131,17 @@ public class HomeworkService {
         long safePage = Math.max(1, page);
         long safeSize = Math.min(Math.max(1, size), MAX_PAGE_SIZE);
 
+        List<Long> scope = studentId != null
+                ? List.of(accessService.requireAccess(userId, studentId).getId())
+                : accessService.accessibleStudentIds(userId);
+        if (scope.isEmpty()) {
+            return PageResult.of(safePage, safeSize, 0, List.of());
+        }
+
         IPage<HomeworkSubmit> result = submitMapper.selectPage(
                 new Page<>(safePage, safeSize),
                 Wrappers.<HomeworkSubmit>lambdaQuery()
-                        .eq(HomeworkSubmit::getUserId, userId)
-                        .eq(studentId != null, HomeworkSubmit::getStudentId, studentId)
+                        .in(HomeworkSubmit::getStudentId, scope)
                         .orderByDesc(HomeworkSubmit::getId));
 
         return PageResult.of(safePage, safeSize, result.getTotal(),
@@ -141,7 +150,7 @@ public class HomeworkService {
 
     /** 取消排队中的任务并退还额度。已经开始批改的无法取消，避免白扣一次调用。 */
     public SubmitVo cancel(Long userId, Long submitId) {
-        HomeworkSubmit submit = requireOwned(userId, submitMapper.selectById(submitId));
+        HomeworkSubmit submit = requireOwned(userId, submitId, true);
         if (submit.getStatus() != HomeworkSubmit.STATUS_PENDING) {
             throw BizException.badRequest("任务已在处理中或已结束，无法取消");
         }
@@ -159,7 +168,7 @@ public class HomeworkService {
 
     /** 重试失败的任务。失败时额度已退还，这里重新占用一次。 */
     public SubmitVo retry(Long userId, Long submitId) {
-        HomeworkSubmit submit = requireOwned(userId, submitMapper.selectById(submitId));
+        HomeworkSubmit submit = requireOwned(userId, submitId, true);
         if (submit.getStatus() != HomeworkSubmit.STATUS_FAILED) {
             throw BizException.badRequest("只有失败的任务可以重试");
         }
@@ -197,12 +206,31 @@ public class HomeworkService {
         return QuestionVo.from(question, cropUrl);
     }
 
-    /** 归属校验：不是自己的任务一律按"无权限"拒绝。 */
+    /**
+     * 归属校验：提交人本人，或对该孩子有访问权的家人（妈妈拍的作业爸爸也要能看）。
+     * 取消/重试只有提交人自己可以 —— 动别人提交中的任务会把额度算到对方头上，语义不通。
+     */
+    private HomeworkSubmit requireOwned(Long userId, Long submitId, boolean mutation) {
+        HomeworkSubmit submit = submitMapper.selectById(submitId);
+        if (submit == null) {
+            throw BizException.notFound("批改任务");
+        }
+        boolean mine = submit.getUserId().equals(userId);
+        if (mutation && !mine) {
+            throw BizException.forbidden();
+        }
+        if (!mine && !accessService.accessibleStudentIds(userId).contains(submit.getStudentId())) {
+            throw BizException.forbidden();
+        }
+        return submit;
+    }
+
     private HomeworkSubmit requireOwned(Long userId, HomeworkSubmit submit) {
         if (submit == null) {
             throw BizException.notFound("批改任务");
         }
-        if (!submit.getUserId().equals(userId)) {
+        boolean mine = submit.getUserId().equals(userId);
+        if (!mine && !accessService.accessibleStudentIds(userId).contains(submit.getStudentId())) {
             throw BizException.forbidden();
         }
         return submit;

@@ -27,6 +27,8 @@ public class MinioStorageClient implements StorageClient {
     private static final Logger log = LoggerFactory.getLogger(MinioStorageClient.class);
 
     private final MinioClient client;
+    /** 只用于生成预签名 URL 的 client。Host 参与签名，必须用「对外可达」的地址签 */
+    private final MinioClient presignClient;
     private final String bucket;
     private final boolean autoCreateBucket;
     private final int presignSeconds;
@@ -41,9 +43,20 @@ public class MinioStorageClient implements StorageClient {
         this.client = MinioClient.builder()
                 .endpoint(props.endpoint())
                 .credentials(props.accessKey(), props.secretKey())
+                // 显式指定 region：SDK 默认会向 endpoint 发 GetBucketLocation 探测，
+                // presign client 的地址在容器里根本连不通（本来也不该连），指定后签名纯本地运算
+                .region("us-east-1")
                 .build();
-        log.info("MinIO 存储已启用：endpoint={} bucket={} 预签名有效期={}min",
-                props.endpoint(), bucket, props.presignExpire().toMinutes());
+        // presign-endpoint 不配时与 endpoint 一致（本机直跑 MinIO 的场景）
+        String presignEndpoint = props.presignEndpoint() == null || props.presignEndpoint().isBlank()
+                ? props.endpoint() : props.presignEndpoint();
+        this.presignClient = MinioClient.builder()
+                .endpoint(presignEndpoint)
+                .credentials(props.accessKey(), props.secretKey())
+                .region("us-east-1")
+                .build();
+        log.info("MinIO 存储已启用：endpoint={} presign-endpoint={} bucket={} 预签名有效期={}min",
+                props.endpoint(), presignEndpoint, bucket, props.presignExpire().toMinutes());
     }
 
     @Override
@@ -68,7 +81,7 @@ public class MinioStorageClient implements StorageClient {
         // 签名本身是本地运算，但 MinIO 服务端会校验桶是否存在，所以这一步也要先确保桶
         ensureBucket();
         try {
-            return client.getPresignedObjectUrl(GetPresignedObjectUrlArgs.builder()
+            return presignClient.getPresignedObjectUrl(GetPresignedObjectUrlArgs.builder()
                     .method(Method.GET)
                     .bucket(bucket)
                     .object(key)

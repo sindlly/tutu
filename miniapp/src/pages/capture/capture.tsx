@@ -1,7 +1,7 @@
 import { View, Text, Image } from '@tarojs/components'
 import Taro, { useDidShow } from '@tarojs/taro'
 import { useState } from 'react'
-import { ensureLogin } from '@/services/auth'
+import { ensureActiveStudent, ensureLogin } from '@/services/auth'
 import { uploadHomeworkImage } from '@/services/file'
 import { createSubmit } from '@/services/homework'
 import { userStore } from '@/store/user'
@@ -17,16 +17,18 @@ export default function Capture() {
   const [subject, setSubject] = useState<string>('math')
   const [busy, setBusy] = useState(false)
   const [progressText, setProgressText] = useState('')
+  const [kidName, setKidName] = useState('')
 
   // 兜底：用户可能在别处清过登录态，这里补一次登录并把年级带出来
   useDidShow(() => {
     void (async () => {
       try {
         await ensureLogin()
-        const student = userStore.getStudent()
-        if (student) {
-          setGrade(student.grade)
-        }
+        // 多孩必选：没选孩子就跳选择页，本页不加载
+        const student = await ensureActiveStudent()
+        if (!student) return
+        setGrade(student.grade)
+        setKidName(student.name)
       } catch {
         // 登录失败时提交会再次报错，不在这里重复提示
       }
@@ -66,9 +68,10 @@ export default function Capture() {
       Taro.showToast({ title: '请先拍照或选择作业照片', icon: 'none' })
       return
     }
-    const current = userStore.getStudent()
+    const current = userStore.getActiveStudent()
     if (!current) {
-      Taro.showToast({ title: '登录状态异常，请退出小程序重进', icon: 'none' })
+      Taro.showToast({ title: '请先选择孩子', icon: 'none' })
+      Taro.navigateTo({ url: '/pages/child-select/child-select' })
       return
     }
 
@@ -106,6 +109,13 @@ export default function Capture() {
 
   return (
     <View className="page capture">
+      {kidName && (
+        <View className="kid-strip" onClick={() => Taro.navigateTo({ url: '/pages/child-select/child-select' })}>
+          <Text>给「{kidName}」批改</Text>
+          <Text className="kid-strip-op">切换</Text>
+        </View>
+      )}
+
       <View className="card">
         <View className="row-between">
           <Text className="title">作业照片</Text>

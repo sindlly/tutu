@@ -33,19 +33,22 @@ public class HomeworkCreationService {
     private final StudentMapper studentMapper;
     private final UserMapper userMapper;
     private final QuotaService quotaService;
+    private final StudentAccessService accessService;
 
     public HomeworkCreationService(HomeworkSubmitMapper submitMapper,
                                    SubmitImageMapper submitImageMapper,
                                    AppFileMapper fileMapper,
                                    StudentMapper studentMapper,
                                    UserMapper userMapper,
-                                   QuotaService quotaService) {
+                                   QuotaService quotaService,
+                                   StudentAccessService accessService) {
         this.submitMapper = submitMapper;
         this.submitImageMapper = submitImageMapper;
         this.fileMapper = fileMapper;
         this.studentMapper = studentMapper;
         this.userMapper = userMapper;
         this.quotaService = quotaService;
+        this.accessService = accessService;
     }
 
     /**
@@ -91,14 +94,8 @@ public class HomeworkCreationService {
     }
 
     private Student requireOwnedStudent(Long userId, Long studentId) {
-        Student student = studentMapper.selectById(studentId);
-        if (student == null) {
-            throw BizException.notFound("学生");
-        }
-        if (!student.getUserId().equals(userId)) {
-            throw BizException.forbidden();
-        }
-        return student;
+        // 家人绑定的孩子也可以提交批改（奶奶拍照、爷爷提交），只要对孩子有访问权
+        return accessService.requireAccess(userId, studentId);
     }
 
     /** 逐个校验图片归属与类型。只要有一张不是自己的就直接拒绝，不给"部分可用"的余地。 */

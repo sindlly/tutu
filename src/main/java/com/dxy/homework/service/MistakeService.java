@@ -49,6 +49,7 @@ public class MistakeService {
     private final HomeworkSubmitMapper submitMapper;
     private final StorageClient storageClient;
     private final MistakeArtifactService artifactService;
+    private final StudentAccessService accessService;
 
     public MistakeService(MistakeMapper mistakeMapper,
                           MistakeReviewMapper reviewMapper,
@@ -56,7 +57,8 @@ public class MistakeService {
                           AppFileMapper fileMapper,
                           HomeworkSubmitMapper submitMapper,
                           StorageClient storageClient,
-                          MistakeArtifactService artifactService) {
+                          MistakeArtifactService artifactService,
+                          StudentAccessService accessService) {
         this.mistakeMapper = mistakeMapper;
         this.reviewMapper = reviewMapper;
         this.questionMapper = questionMapper;
@@ -64,18 +66,34 @@ public class MistakeService {
         this.submitMapper = submitMapper;
         this.storageClient = storageClient;
         this.artifactService = artifactService;
+        this.accessService = accessService;
+    }
+
+    /**
+     * 查询范围：数据主权在孩子身上。指定了 studentId 就校验访问权后只看这个孩子；
+     * 没指定就看我能访问的全部孩子（自己创建的 + 家人绑定的）。
+     */
+    private List<Long> scopeOf(Long userId, Long studentId) {
+        if (studentId != null) {
+            accessService.requireAccess(userId, studentId);
+            return List.of(studentId);
+        }
+        return accessService.accessibleStudentIds(userId);
     }
 
     public PageResult<MistakeVo> list(Long userId, Long studentId, String subject, Integer status,
                                       long page, long size) {
         long safePage = Math.max(1, page);
         long safeSize = Math.min(Math.max(1, size), MAX_PAGE_SIZE);
+        List<Long> scope = scopeOf(userId, studentId);
+        if (scope.isEmpty()) {
+            return PageResult.of(safePage, safeSize, 0, List.of());
+        }
 
         IPage<Mistake> result = mistakeMapper.selectPage(
                 new Page<>(safePage, safeSize),
                 Wrappers.<Mistake>lambdaQuery()
-                        .eq(Mistake::getUserId, userId)
-                        .eq(studentId != null, Mistake::getStudentId, studentId)
+                        .in(Mistake::getStudentId, scope)
                         .eq(subject != null && !subject.isBlank(), Mistake::getSubject, subject)
                         .eq(status != null, Mistake::getStatus, status)
                         .orderByDesc(Mistake::getId));
@@ -134,10 +152,9 @@ public class MistakeService {
         int intervalDays = REVIEW_INTERVALS[Math.min(level, REVIEW_INTERVALS.length - 1)];
         int newStatus = (correct && level >= MAX_MASTERY) ? Mistake.STATUS_MASTERED : Mistake.STATUS_ACTIVE;
 
-        // 条件里带上 user_id 双保险，即便上层漏校验也改不到别人的数据
+        // 条件里带上 id；访问权已在 requireOwned 里验证（家人绑定的孩子也能打卡）
         mistakeMapper.update(null, Wrappers.<Mistake>lambdaUpdate()
                 .eq(Mistake::getId, mistakeId)
-                .eq(Mistake::getUserId, userId)
                 .set(Mistake::getMasteryLevel, level)
                 .set(Mistake::getRightStreak, streak)
                 .set(Mistake::getReviewCount, orZero(mistake.getReviewCount()) + 1)
@@ -176,7 +193,6 @@ public class MistakeService {
         Long cardFileId = artifactService.renderCardFor(submit, question, footer);
         mistakeMapper.update(null, Wrappers.<Mistake>lambdaUpdate()
                 .eq(Mistake::getId, mistakeId)
-                .eq(Mistake::getUserId, userId)
                 .set(Mistake::getCardFileId, cardFileId));
 
         return toVo(requireOwned(userId, mistakeId));
@@ -190,7 +206,6 @@ public class MistakeService {
         requireOwned(userId, mistakeId);
         mistakeMapper.update(null, Wrappers.<Mistake>lambdaUpdate()
                 .eq(Mistake::getId, mistakeId)
-                .eq(Mistake::getUserId, userId)
                 .set(Mistake::getStatus, status));
         return toVo(requireOwned(userId, mistakeId));
     }
@@ -198,9 +213,12 @@ public class MistakeService {
     /** 今日待复习（含已过期的），按到期时间升序。 */
     public List<MistakeVo> reviewToday(Long userId, Long studentId, int limit) {
         int safeLimit = Math.min(Math.max(1, limit), MAX_PAGE_SIZE);
+        List<Long> scope = scopeOf(userId, studentId);
+        if (scope.isEmpty()) {
+            return List.of();
+        }
         return mistakeMapper.selectList(Wrappers.<Mistake>lambdaQuery()
-                        .eq(Mistake::getUserId, userId)
-                        .eq(studentId != null, Mistake::getStudentId, studentId)
+                        .in(Mistake::getStudentId, scope)
                         .eq(Mistake::getStatus, Mistake.STATUS_ACTIVE)
                         .le(Mistake::getNextReviewAt, LocalDateTime.now())
                         .orderByAsc(Mistake::getNextReviewAt)
@@ -211,43 +229,42 @@ public class MistakeService {
     }
 
     public MistakeStatsVo stats(Long userId, Long studentId) {
-        long total = count(userId, studentId, null);
-        long active = count(userId, studentId, Mistake.STATUS_ACTIVE);
-        long mastered = count(userId, studentId, Mistake.STATUS_MASTERED);
+        List<Long> scope = scopeOf(userId, studentId);
+        if (scope.isEmpty()) {
+            return new MistakeStatsVo(0, 0, 0, 0, List.of(), List.of());
+        }
+        long total = count(scope, null);
+        long active = count(scope, Mistake.STATUS_ACTIVE);
+        long mastered = count(scope, Mistake.STATUS_MASTERED);
 
         // "今日待复习"= 到期时间早于今天结束，包含之前欠下的
         LocalDateTime endOfToday = LocalDate.now().atTime(LocalTime.MAX);
         Long dueToday = mistakeMapper.selectCount(Wrappers.<Mistake>lambdaQuery()
-                .eq(Mistake::getUserId, userId)
-                .eq(studentId != null, Mistake::getStudentId, studentId)
+                .in(Mistake::getStudentId, scope)
                 .eq(Mistake::getStatus, Mistake.STATUS_ACTIVE)
                 .le(Mistake::getNextReviewAt, endOfToday));
 
         return new MistakeStatsVo(total, active, mastered, dueToday == null ? 0 : dueToday,
-                groupCount(userId, studentId, "subject"), groupCount(userId, studentId, "knowledge_key"));
+                groupCount(scope, "subject"), groupCount(scope, "knowledge_key"));
     }
 
-    private long count(Long userId, Long studentId, Integer status) {
+    private long count(List<Long> scope, Integer status) {
         Long value = mistakeMapper.selectCount(Wrappers.<Mistake>lambdaQuery()
-                .eq(Mistake::getUserId, userId)
-                .eq(studentId != null, Mistake::getStudentId, studentId)
+                .in(Mistake::getStudentId, scope)
                 .eq(status != null, Mistake::getStatus, status));
         return value == null ? 0 : value;
     }
 
     /** 按某列分组计数，只在册错题参与统计。 */
-    private List<MistakeStatsVo.CountItem> groupCount(Long userId, Long studentId, String column) {
+    private List<MistakeStatsVo.CountItem> groupCount(List<Long> scope, String column) {
         QueryWrapper<Mistake> wrapper = new QueryWrapper<>();
         wrapper.select(column + " AS name", "COUNT(*) AS cnt")
-                .eq("user_id", userId)
+                .in("student_id", scope)
                 .eq("status", Mistake.STATUS_ACTIVE)
                 .isNotNull(column)
                 .groupBy(column)
                 .orderByDesc("cnt")
                 .last("LIMIT " + STATS_KNOWLEDGE_LIMIT);
-        if (studentId != null) {
-            wrapper.eq("student_id", studentId);
-        }
 
         return mistakeMapper.selectMaps(wrapper).stream()
                 .map(row -> new MistakeStatsVo.CountItem(
@@ -268,12 +285,17 @@ public class MistakeService {
         return file == null ? null : storageClient.presignedUrl(file.getFileKey());
     }
 
+    /**
+     * 归属校验：错题挂孩子名下，对该孩子有访问权的人（创建者 + 家人绑定）都能读、能打卡。
+     * 保留提交人判定做兜底 —— 极端情况下关系表数据缺失时不至于把提交人自己挡在外面。
+     */
     private Mistake requireOwned(Long userId, Long mistakeId) {
         Mistake mistake = mistakeMapper.selectById(mistakeId);
         if (mistake == null) {
             throw BizException.notFound("错题");
         }
-        if (!mistake.getUserId().equals(userId)) {
+        if (!mistake.getUserId().equals(userId)
+                && !accessService.accessibleStudentIds(userId).contains(mistake.getStudentId())) {
             throw BizException.forbidden();
         }
         return mistake;

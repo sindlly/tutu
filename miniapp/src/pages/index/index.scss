@@ -3,21 +3,23 @@
 }
 
 .hero {
-  padding: 24px 8px 32px;
+  padding: 16px 8px 32px;
 }
 
 .hero-title {
-  font-size: 48px;
+  font-size: 52px;
   font-weight: 700;
-  letter-spacing: 2px;
+  letter-spacing: 4px;
+  font-family: "Songti SC", "STSong", "Noto Serif SC", serif;
 }
 
 .hero-sub {
   margin-top: 12px;
-  color: #8c929e;
+  color: #8b8171;
   font-size: 26px;
 }
 
+/* 可用次数：红笔写在本子上的数字 */
 .quota {
   margin-top: 28px;
   display: flex;
@@ -27,38 +29,51 @@
 .quota-num {
   font-size: 72px;
   font-weight: 700;
-  color: #3b6ef5;
+  color: #d2402e;
   line-height: 1;
+  font-family: "Songti SC", "STSong", "Noto Serif SC", serif;
 }
 
 .quota-label {
   margin-left: 12px;
-  color: #8c929e;
+  color: #8b8171;
   font-size: 26px;
 }
 
+/* 主行动区：一张红底「作业本封面」，内圈白虚线是相纸边框 */
 .primary-action {
-  background: linear-gradient(135deg, #4a7bf7, #3b6ef5);
-  border-radius: 24px;
-  padding: 44px 32px;
-  color: #fff;
-  box-shadow: 0 8px 24px rgba(59, 110, 245, 0.25);
-}
+  position: relative;
+  background: #d2402e;
+  border-radius: 12px;
+  padding: 48px 36px;
+  color: #fffdf6;
 
-.primary-action-icon {
-  font-size: 56px;
+  &:active {
+    background: #b8341f;
+  }
 }
 
 .primary-action-main {
-  margin-top: 16px;
-  font-size: 40px;
-  font-weight: 600;
+  font-size: 44px;
+  font-weight: 700;
+  letter-spacing: 6px;
+  font-family: "Songti SC", "STSong", "Noto Serif SC", serif;
 }
 
 .primary-action-sub {
-  margin-top: 8px;
+  margin-top: 12px;
   font-size: 24px;
   opacity: 0.85;
+  letter-spacing: 1px;
+}
+
+.primary-action-arrow {
+  position: absolute;
+  right: 36px;
+  bottom: 48px;
+  font-size: 44px;
+  font-weight: 300;
+  color: rgba(255, 253, 246, 0.85);
 }
 
 .record {
@@ -66,7 +81,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 24px 0;
-  border-bottom: 2px solid #f0f2f5;
+  border-bottom: 2px solid #e7dfcc;
 
   &:last-child {
     border-bottom: none;
@@ -88,10 +103,12 @@
   margin-left: 20px;
 }
 
+/* 分数：老师的红笔分 */
 .score {
   font-size: 40px;
   font-weight: 700;
-  color: #3b6ef5;
+  color: #d2402e;
+  font-family: "Songti SC", "STSong", "Noto Serif SC", serif;
 }
 
 .tips {

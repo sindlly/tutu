@@ -22,7 +22,7 @@ npm run dev:weapp       # 开发模式（监听改动）
 npm run typecheck       # 类型检查（构建只剥类型，不做检查）
 ```
 
-页面：首页 / 拍照提交 / 批改进度 / 结果 / 错题本 / 错题详情 / 我的。
+页面：首页 / 拍照提交 / 批改进度 / 结果 / 错题本 / 错题详情 / 选孩子 / 孩子管理 / 我的。
 
 **导入微信开发者工具**：新建项目 → 目录选 `miniapp/`（`project.config.json` 里 `miniprogramRoot` 已指向 `dist/`）→ 详情里勾选「不校验合法域名…」（因为开发期后端是 `http://127.0.0.1:8080`）。
 
@@ -44,7 +44,54 @@ H5 跨域需要后端开 CORS：`.env` 里设 `CORS_ALLOWED_ORIGINS=http://127.0
 
 ---
 
-## 零、本地开发环境
+## 多孩与家人共享（用户系统）
+
+**数据主权在孩子身上**：错题、批改记录挂 `student_id`，谁对孩子有访问权（创建者或家人绑定），谁就能看到同一份数据 —— 妈妈绑定了爸爸添加的孩子后，看到的是孩子名下的全部数据，不只是自己提交的。
+
+```
+t_student      孩子档案（含 bind_code 6 位编号）
+t_user_student 用户-孩子关系（relation: 1创建者 / 2家人绑定）
+```
+
+接口（`StudentController`）：
+
+| 方法 | 路径 | 说明 |
+|---|---|---|
+| GET | `/api/v1/students` | 我能访问的孩子（创建的 + 绑定的） |
+| POST | `/api/v1/students` | 添加孩子 {name, grade, school?} |
+| POST | `/api/v1/students/bind` | 凭 6 位编号绑定 {code} |
+| PUT | `/api/v1/students/{id}` | 改档案，仅创建者 |
+| POST | `/api/v1/students/{id}/unbind` | 家人解绑自己 |
+
+安全要点：
+
+- **绑定用编号不用自增 id**：自增 id 可被连续枚举，等于把别人孩子的数据拱手送人；编号是 `MD5(id+盐)` 截 6 位，反推与枚举都不可行。
+- 越权防线统一在 `StudentAccessService`：错题/批改/统计按「我能访问的 student_id 集合」过滤；`mistake.user_id` 保留为提交人记录，不再是过滤主键。
+- 取消/重试批改只有提交人本人可以（动别人提交中的任务会把额度算到对方头上）。
+
+前端流程：登录返回 `students` 数组 → 单孩自动选中；多孩且未选时，各页面 `ensureActiveStudent()` 跳「选孩子」页，选完 `navigateBack` 原页面自动带新选择重载。切换入口在错题本/拍照页顶部的孩子条、我的页「孩子管理」。
+
+---
+
+## 零点五、Docker 一键起（推荐）
+
+```bash
+brew install colima docker docker-compose   # 只需一次（macOS）
+colima start --cpu 4 --memory 8             # 起轻量 Docker VM
+docker compose up -d --build                # MySQL+Redis+MinIO+API 四件套
+```
+
+- API 在 `http://127.0.0.1:8080`，冒烟：`./scripts/smoke-test.sh`
+- 本地默认端口与本机原生服务错开：MySQL **3307** / Redis **6380** / MinIO **9002**（控制台 9003）
+- 数据落在 `./data/docker/`（已 gitignore）；密钥直接复用根目录 `.env`，容器内地址由 compose 覆盖成服务名
+- **上服务器**：`export MYSQL_PORT=3306 REDIS_PORT=6379 MINIO_PORT=9000 MINIO_CONSOLE_PORT=9001` 后再 `up -d`，就是标准端口
+- 常用：`docker compose logs -f api` 看日志，`docker compose down` 停（数据保留），`colima stop` 关 VM
+- **跑 pipeline-test**（脚本直连 DB 做断言，端口要跟着换）：
+  `DB_URL=jdbc:mysql://127.0.0.1:3307/homework_grader?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true RESET=1 ./scripts/pipeline-test.sh`
+
+镜像构建是多阶段的：依赖层走 BuildKit 缓存，改代码重 build 只编译不重新下依赖。
+
+## 零、本地开发环境（不装 Docker 的手动做法）
 
 ### 1. 启动 MySQL 与 Redis
 

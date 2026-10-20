@@ -6,8 +6,8 @@
   width: 100%;
   border-radius: 20px;
   margin-bottom: 24px;
-  background: #fff;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  background: #fffdf6;
+  border: 1px solid #e8dfc9;
 }
 
 .md-stem {
@@ -25,7 +25,7 @@
 .md-label {
   width: 150px;
   flex-shrink: 0;
-  color: #8c929e;
+  color: #8b8171;
   font-size: 26px;
 }
 
@@ -34,12 +34,12 @@
   word-break: break-all;
 
   &.ok {
-    color: #389e0d;
+    color: #1f8a5d;
     font-weight: 600;
   }
 
   &.bad {
-    color: #cf1322;
+    color: #d2402e;
     font-weight: 600;
   }
 }
@@ -53,7 +53,7 @@
   margin-top: 6px;
   font-size: 28px;
   line-height: 1.65;
-  color: #4e5969;
+  color: #4a463e;
 }
 
 .md-tags {
@@ -61,7 +61,7 @@
 }
 
 .mastery {
-  color: #d48806;
+  color: #b07818;
   font-size: 30px;
   letter-spacing: 2px;
 }
@@ -87,15 +87,15 @@
   font-weight: 600;
 
   &.good {
-    background: #f6ffed;
-    color: #389e0d;
+    background: #e4f2e9;
+    color: #1f8a5d;
     border: 2px solid #b7eb8f;
   }
 
   &.bad {
-    background: #fff1f0;
-    color: #cf1322;
-    border: 2px solid #ffa39e;
+    background: #fbe9e4;
+    color: #d2402e;
+    border: 2px solid #e89c8e;
   }
 
   &.disabled {
@@ -111,7 +111,7 @@
 .crop-img {
   width: 100%;
   border-radius: 12px;
-  background: #f0f2f5;
+  background: #e7dfcc;
 }
 
 .log {
@@ -119,7 +119,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 16px 0;
-  border-bottom: 2px solid #f0f2f5;
+  border-bottom: 2px solid #e7dfcc;
 
   &:last-child {
     border-bottom: none;
@@ -127,12 +127,12 @@
 }
 
 .log-ok {
-  color: #389e0d;
+  color: #1f8a5d;
   font-weight: 600;
 }
 
 .log-bad {
-  color: #cf1322;
+  color: #d2402e;
   font-weight: 600;
 }
 
@@ -143,7 +143,7 @@
 .md-remove {
   margin-top: 24px;
   text-align: center;
-  color: #8c929e;
+  color: #8b8171;
   font-size: 28px;
   padding: 20px;
 }

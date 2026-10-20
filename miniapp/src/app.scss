@@ -1,24 +1,50 @@
-/* 全局样式。页面内尽量用 class，避免行内样式到处散落。 */
+/*
+ * 全局设计系统 —— 「作业本美学」
+ *
+ * 这是产品最独有的隐喻：纸感底色、墨色文字、老师批改的红笔色做唯一强调色、
+ * 作业本格线做背景细节。避免任何 AI 味的蓝紫渐变与玻璃拟态。
+ *
+ * 色板（页面内直接用字面值，与这里保持一致）：
+ *   纸面     #f6f1e4   页面底色（暖米白，不是冷灰）
+ *   纸卡     #fffdf6   卡片底色，配 1px 纸边 #e8dfc9
+ *   墨色     #33302a   正文，暖调近黑（像钢笔字）
+ *   笔灰     #8b8171   次要文字，暖灰
+ *   批改红   #d2402e   唯一强调色（主按钮、错、关键数字）
+ *   批改绿   #1f8a5d   对勾、掌握
+ *   待核对   #b07818   琥珀，只用于「建议核对」
+ *   格线     #e7dfcc   分隔线（作业本横线的颜色）
+ */
 
 page {
-  background: #f5f6f8;
-  color: #1f2329;
+  background: #f6f1e4;
+  color: #33302a;
   font-size: 28px;
   font-family: -apple-system, "PingFang SC", "Helvetica Neue", sans-serif;
 }
 
+/* 作业本横线背景：极淡，只是「纸」的暗示，不参与信息层级 */
 .page {
   min-height: 100vh;
   padding: 24px;
   box-sizing: border-box;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 95px,
+      rgba(139, 129, 113, 0.1) 95px,
+      rgba(139, 129, 113, 0.1) 97px
+    );
 }
 
+/* 纸卡：白纸一张，细边框代替阴影 —— 纸是靠「边」立起来的，不是靠「影」 */
 .card {
-  background: #fff;
-  border-radius: 20px;
+  background: #fffdf6;
+  border: 1px solid #e8dfc9;
+  border-radius: 12px;
   padding: 32px;
   margin-bottom: 24px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  box-shadow: none;
 }
 
 .row {
@@ -33,72 +59,147 @@ page {
 }
 
 .muted {
-  color: #8c929e;
+  color: #8b8171;
   font-size: 24px;
 }
 
+/* 标题用宋体栈：教材/作业本的字，iOS 生效，安卓回退系统字体 */
 .title {
   font-size: 32px;
   font-weight: 600;
+  font-family: "Songti SC", "STSong", "Noto Serif SC", serif;
 }
 
 .mt8 { margin-top: 8px; }
 .mt16 { margin-top: 16px; }
 .mt24 { margin-top: 24px; }
 
+/* 主按钮 = 红笔。全屏只允许一个红底按钮 */
 .btn-primary {
-  background: #3b6ef5;
-  color: #fff;
-  border-radius: 16px;
+  background: #d2402e;
+  color: #fffdf6;
+  border-radius: 12px;
   font-size: 32px;
+  font-weight: 500;
   height: 92px;
   line-height: 92px;
   text-align: center;
+  letter-spacing: 2px;
 
   &.disabled {
-    background: #c8d0e0;
+    background: #d8cdb8;
+  }
+
+  &:active {
+    background: #b8341f;
   }
 }
 
 .btn-ghost {
-  background: #fff;
-  color: #3b6ef5;
-  border: 2px solid #3b6ef5;
-  border-radius: 16px;
+  background: transparent;
+  color: #d2402e;
+  border: 2px solid #d2402e;
+  border-radius: 12px;
   font-size: 32px;
   height: 92px;
   line-height: 88px;
   text-align: center;
 }
 
+/* 标签：对错是双通道的 —— 颜色 + 符号，色弱也能分辨 */
 .tag {
   display: inline-block;
   padding: 4px 16px;
-  border-radius: 999px;
-  background: #f0f2f5;
-  color: #8c929e;
+  border-radius: 8px;
+  background: #f0ead9;
+  color: #8b8171;
   font-size: 22px;
   margin-right: 12px;
 }
 
 .tag-wrong {
-  background: #fff1f0;
-  color: #cf1322;
+  background: #fbe9e4;
+  color: #d2402e;
 }
 
 .tag-right {
-  background: #f6ffed;
-  color: #389e0d;
+  background: #e4f2e9;
+  color: #1f8a5d;
 }
 
 .tag-check {
-  background: #fffbe6;
-  color: #d48806;
+  background: #f7efdc;
+  color: #b07818;
 }
 
 .empty {
   padding: 120px 0;
   text-align: center;
-  color: #8c929e;
+  color: #8b8171;
   font-size: 26px;
+}
+
+/* 红笔批注感的正文强调 */
+.red-pen {
+  color: #d2402e;
+}
+
+/* 装订线：卡片左侧的缝线细节，给「本子」的感觉 */
+.stitched {
+  position: relative;
+
+  &::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 16px;
+    bottom: 16px;
+    width: 0;
+    border-left: 2px dashed rgba(139, 129, 113, 0.35);
+  }
+}
+
+/* 当前孩子条：出现在需要按孩子过滤的页面顶部，点击可切换 */
+.kid-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fffdf6;
+  border: 1px solid #e8dfc9;
+  border-radius: 12px;
+  padding: 20px 28px;
+  margin-bottom: 24px;
+  font-size: 26px;
+  color: #33302a;
+}
+
+.kid-strip-op {
+  color: #d2402e;
+  font-size: 24px;
+
+  &:active {
+    opacity: 0.7;
+  }
+}
+
+/* 首页当前孩子的小标签 */
+.kid-chip {
+  display: inline-flex;
+  align-items: center;
+  background: #fffdf6;
+  border: 1px solid #e8dfc9;
+  border-radius: 999px;
+  padding: 8px 24px;
+  font-size: 24px;
+  color: #4a463e;
+  margin-bottom: 20px;
+
+  &:active {
+    border-color: #d2402e;
+  }
+}
+
+.kid-chip-switch {
+  margin-left: 12px;
+  color: #d2402e;
 }

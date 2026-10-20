@@ -11,7 +11,7 @@
   width: 108px;
   height: 108px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #4a7bf7, #3b6ef5);
+  background: #d2402e;
   color: #fff;
   font-size: 44px;
   font-weight: 600;
@@ -35,13 +35,13 @@
 .quota-bar {
   height: 16px;
   border-radius: 999px;
-  background: #f0f2f5;
+  background: #e7dfcc;
   overflow: hidden;
 }
 
 .quota-fill {
   height: 100%;
-  background: linear-gradient(90deg, #4a7bf7, #3b6ef5);
+  background: #d2402e;
   border-radius: 999px;
   transition: width 0.3s;
 }
@@ -62,17 +62,17 @@
   font-weight: 700;
 
   &.warn {
-    color: #d48806;
+    color: #b07818;
   }
 
   &.ok {
-    color: #389e0d;
+    color: #1f8a5d;
   }
 }
 
 .dev {
-  border: 2px dashed #ffd591;
-  background: #fffbe6;
+  border: 2px dashed #e0b568;
+  background: #f7efdc;
 }
 
 .dev-row {
@@ -84,7 +84,7 @@
   flex: 1;
   height: 80px;
   padding: 0 24px;
-  background: #fff;
+  background: #fffdf6;
   border-radius: 12px;
   font-size: 28px;
 }
@@ -94,7 +94,7 @@
   height: 80px;
   line-height: 80px;
   text-align: center;
-  background: #3b6ef5;
+  background: #d2402e;
   color: #fff;
   border-radius: 12px;
   font-size: 28px;

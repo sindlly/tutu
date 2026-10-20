@@ -1,0 +1,178 @@
+.children {
+  padding-bottom: 48px;
+}
+
+.list-head {
+  font-size: 32px;
+  font-weight: 600;
+  padding: 8px 8px 24px;
+  font-family: "Songti SC", "STSong", "Noto Serif SC", serif;
+}
+
+.kid-list {
+  margin-bottom: 32px;
+}
+
+.kid-row {
+  background: #fffdf6;
+  border: 1px solid #e8dfc9;
+  border-radius: 12px;
+  padding: 28px 32px;
+  margin-bottom: 20px;
+
+  &.kid-row-on {
+    border-color: #d2402e;
+  }
+}
+
+.kid-row-main {
+  display: flex;
+  align-items: center;
+}
+
+.kid-row-avatar {
+  width: 84px;
+  height: 84px;
+  border-radius: 12px;
+  background: #f0ead9;
+  color: #33302a;
+  font-size: 40px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 24px;
+  font-family: "Songti SC", "STSong", "Noto Serif SC", serif;
+}
+
+.kid-row-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.kid-row-name {
+  font-size: 32px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+}
+
+.kid-row-now {
+  margin-left: 12px;
+  font-size: 20px;
+  color: #fffdf6;
+  background: #d2402e;
+  border-radius: 6px;
+  padding: 2px 12px;
+  font-weight: 400;
+}
+
+.kid-row-meta {
+  margin-top: 8px;
+  color: #8b8171;
+  font-size: 24px;
+}
+
+.kid-row-ops {
+  display: flex;
+  align-items: center;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 2px dashed rgba(139, 129, 113, 0.25);
+}
+
+.kid-row-op {
+  font-size: 24px;
+  color: #b07818;
+
+  &:active {
+    color: #d2402e;
+  }
+}
+
+.kid-row-unbind {
+  margin-left: 32px;
+  color: #8b8171;
+}
+
+.form-card {
+  margin-top: 8px;
+}
+
+.form-title {
+  font-size: 32px;
+  font-weight: 600;
+  font-family: "Songti SC", "STSong", "Noto Serif SC", serif;
+}
+
+.form-sub {
+  margin-top: 12px;
+  color: #8b8171;
+  font-size: 24px;
+  line-height: 1.6;
+}
+
+.form-row {
+  margin-top: 24px;
+}
+
+.form-input {
+  background: #f6f1e4;
+  border: 1px solid #e8dfc9;
+  border-radius: 12px;
+  height: 88px;
+  padding: 0 24px;
+  font-size: 30px;
+}
+
+.form-code {
+  text-align: center;
+  letter-spacing: 12px;
+  font-weight: 700;
+  font-size: 36px;
+
+  &.form-code-focus {
+    border-color: #d2402e;
+  }
+}
+
+.form-label {
+  margin-top: 24px;
+  color: #8b8171;
+  font-size: 24px;
+}
+
+/* 年级：一排小方格，像作业本封面填年级 */
+.grade-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.grade-cell {
+  width: 88px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e8dfc9;
+  border-radius: 10px;
+  background: #f6f1e4;
+  font-size: 28px;
+  color: #33302a;
+
+  &.grade-cell-on {
+    background: #d2402e;
+    border-color: #d2402e;
+    color: #fffdf6;
+  }
+}
+
+.form-btn {
+  margin-top: 32px;
+
+  &.disabled {
+    opacity: 0.6;
+  }
+}

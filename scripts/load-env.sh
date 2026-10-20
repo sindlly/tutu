@@ -22,6 +22,12 @@ load_dotenv() {
     value="${value%"${value##*[![:space:]]}"}"
     value="${value%\"}"
     value="${value#\"}"
+    # 外部已显式 export 的变量优先于 .env（与 docker compose env_file 语义一致）。
+    # 场景：Docker 栈的 MySQL 映射在 3307，跑 pipeline-test 时要覆盖 DB_URL：
+    #   DB_URL=jdbc:mysql://127.0.0.1:3307/... ./scripts/pipeline-test.sh
+    if [ -n "${!key:-}" ]; then
+      continue
+    fi
     export "$key=$value"
   done < "$file"
 }

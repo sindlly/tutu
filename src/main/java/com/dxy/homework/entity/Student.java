@@ -26,6 +26,10 @@ public class Student {
     private Integer grade;
 
     private String school;
+
+    /** 孩子编号，家人凭这个绑定。只有对孩子有访问权的人能看到 */
+    private String bindCode;
+
     private Integer sortNo;
 
     @TableField(fill = FieldFill.INSERT)

@@ -14,7 +14,7 @@
   height: 200px;
   border-radius: 16px;
   overflow: hidden;
-  background: #f0f2f5;
+  background: #e7dfcc;
 }
 
 .thumb-img {
@@ -41,20 +41,20 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border: 2px dashed #c8d0e0;
-  background: #fafbfd;
+  border: 2px dashed #d8cdb8;
+  background: #f6f1e4;
 }
 
 .thumb-add-icon {
   font-size: 56px;
-  color: #8c929e;
+  color: #8b8171;
   line-height: 1;
 }
 
 .thumb-add-text {
   margin-top: 10px;
   font-size: 24px;
-  color: #8c929e;
+  color: #8b8171;
 }
 
 .guide {
@@ -70,14 +70,14 @@
 .option {
   padding: 14px 32px;
   border-radius: 999px;
-  background: #f0f2f5;
-  color: #4e5969;
+  background: #e7dfcc;
+  color: #4a463e;
   font-size: 28px;
 }
 
 .option-active {
-  background: #e8effe;
-  color: #3b6ef5;
+  background: #fbe9e4;
+  color: #d2402e;
   font-weight: 600;
 }
 

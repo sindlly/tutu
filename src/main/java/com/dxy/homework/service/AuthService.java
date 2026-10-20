@@ -14,6 +14,7 @@ import com.dxy.homework.vo.LoginVo;
 import com.dxy.homework.vo.StudentVo;
 import com.dxy.homework.vo.UserVo;
 import java.time.LocalDateTime;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -34,19 +35,25 @@ public class AuthService {
     private final UserMapper userMapper;
     private final StudentMapper studentMapper;
     private final TokenService tokenService;
+    private final StudentAccessService studentAccessService;
+    private final StudentService studentService;
 
     public AuthService(WxMiniAppClient wxMiniAppClient,
                        WxProperties wxProperties,
                        AuthProperties authProperties,
                        UserMapper userMapper,
                        StudentMapper studentMapper,
-                       TokenService tokenService) {
+                       TokenService tokenService,
+                       StudentAccessService studentAccessService,
+                       StudentService studentService) {
         this.wxMiniAppClient = wxMiniAppClient;
         this.wxProperties = wxProperties;
         this.authProperties = authProperties;
         this.userMapper = userMapper;
         this.studentMapper = studentMapper;
         this.tokenService = tokenService;
+        this.studentAccessService = studentAccessService;
+        this.studentService = studentService;
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -65,9 +72,18 @@ public class AuthService {
         }
 
         Student student = ensureDefaultStudent(user, request);
+        List<StudentVo> students = studentService.myStudents(user.getId());
+        if (students.isEmpty()) {
+            // 理论上 ensureDefaultStudent 之后不会为空；防御性兜底，避免前端拿不到默认孩子
+            students = List.of(StudentVo.from(student, true));
+        }
+        StudentVo current = students.stream()
+                .filter(s -> s.id().equals(student.getId()))
+                .findFirst().orElse(students.get(0));
+
         String token = tokenService.issue(user.getId());
         return new LoginVo(token, tokenService.ttl().toSeconds(), newUser,
-                UserVo.from(user), StudentVo.from(student));
+                UserVo.from(user), current, students);
     }
 
     /**
@@ -124,6 +140,11 @@ public class AuthService {
                 .orderByAsc(Student::getId)
                 .last("LIMIT 1"));
         if (existing != null) {
+            // 老数据可能缺关系表记录（V2 之前的存量）或编号，顺手补上
+            studentAccessService.bind(user.getId(), existing.getId(), StudentAccessService.RELATION_OWNER);
+            if (!StringUtils.hasText(existing.getBindCode())) {
+                existing.setBindCode(studentService.regenerateBindCode(existing));
+            }
             return existing;
         }
 
@@ -135,6 +156,9 @@ public class AuthService {
         student.setSortNo(0);
         student.setDeleted(0);
         studentMapper.insert(student);
+        student.setBindCode(studentService.regenerateBindCode(student));
+        studentMapper.updateById(student);
+        studentAccessService.bind(user.getId(), student.getId(), StudentAccessService.RELATION_OWNER);
         return student;
     }
 }

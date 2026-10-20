@@ -2,7 +2,7 @@ import { View, Text, Image } from '@tarojs/components'
 import Taro, { useDidShow } from '@tarojs/taro'
 import { useState } from 'react'
 import { listMistakes, mistakeStats, reviewToday } from '@/services/mistake'
-import { ensureLogin } from '@/services/auth'
+import { ensureActiveStudent, ensureLogin } from '@/services/auth'
 import { userStore } from '@/store/user'
 import { subjectLabel, masteryStars, formatDate } from '@/utils/format'
 import { SUBJECTS } from '@/types/api'
@@ -19,6 +19,7 @@ export default function Mistakes() {
   const [subject, setSubject] = useState<string>('')
   const [page, setPage] = useState(1)
   const [loading, setLoading] = useState(false)
+  const [kidName, setKidName] = useState('')
 
   useDidShow(() => {
     void reload()
@@ -28,7 +29,11 @@ export default function Mistakes() {
     setLoading(true)
     try {
       await ensureLogin()
-      const studentId = userStore.getStudent()?.id
+      // 多孩必选：错题本按孩子分册，没选孩子就跳选择页
+      const active = await ensureActiveStudent()
+      if (!active) return
+      setKidName(active.name)
+      const studentId = active.id
       const [s, due, pageResult] = await Promise.all([
         mistakeStats(studentId),
         reviewToday({ studentId, limit: 5 }),
@@ -49,7 +54,7 @@ export default function Mistakes() {
     setSubject(next)
     setLoading(true)
     try {
-      const studentId = userStore.getStudent()?.id
+      const studentId = userStore.getActiveStudent()?.id
       const result = await listMistakes({
         studentId,
         subject: next || undefined,
@@ -70,7 +75,7 @@ export default function Mistakes() {
     if (loading || list.length >= total) return
     setLoading(true)
     try {
-      const studentId = userStore.getStudent()?.id
+      const studentId = userStore.getActiveStudent()?.id
       const next = page + 1
       const result = await listMistakes({
         studentId,
@@ -93,6 +98,16 @@ export default function Mistakes() {
 
   return (
     <View className="page mistakes">
+      {kidName && (
+        <View
+          className="kid-strip"
+          onClick={() => Taro.navigateTo({ url: '/pages/child-select/child-select' })}
+        >
+          <Text>「{kidName}」的错题本</Text>
+          <Text className="kid-strip-op">切换孩子</Text>
+        </View>
+      )}
+
       <View className="card stats">
         <View className="stats-row">
           <View className="stat">

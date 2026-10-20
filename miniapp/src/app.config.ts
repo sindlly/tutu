@@ -6,19 +6,21 @@ export default defineAppConfig({
     'pages/result/result',
     'pages/mistakes/mistakes',
     'pages/mistake-detail/mistake-detail',
+    'pages/child-select/child-select',
+    'pages/children/children',
     'pages/profile/profile',
   ],
   window: {
-    backgroundTextStyle: 'light',
-    navigationBarBackgroundColor: '#ffffff',
+    backgroundTextStyle: 'dark',
+    navigationBarBackgroundColor: '#f6f1e4',
     navigationBarTitleText: '拍照批改',
     navigationBarTextStyle: 'black',
-    backgroundColor: '#f5f6f8',
+    backgroundColor: '#f6f1e4',
   },
   tabBar: {
-    color: '#8c929e',
-    selectedColor: '#3b6ef5',
-    backgroundColor: '#ffffff',
+    color: '#8b8171',
+    selectedColor: '#d2402e',
+    backgroundColor: '#fffdf6',
     borderStyle: 'black',
     // 只用文字不用图标：省掉图标资源，也避免为了凑图而引入质量差的素材
     list: [

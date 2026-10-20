@@ -1,17 +1,18 @@
 import { View, Text } from '@tarojs/components'
 import Taro, { useDidShow } from '@tarojs/taro'
 import { useState } from 'react'
-import { ensureLogin } from '@/services/auth'
+import { ensureActiveStudent, ensureLogin } from '@/services/auth'
 import { quotaToday } from '@/services/quota'
 import { listSubmits } from '@/services/homework'
 import { userStore } from '@/store/user'
 import { SubmitStatus } from '@/types/api'
-import type { QuotaVo, SubmitVo } from '@/types/api'
+import type { QuotaVo, StudentVo, SubmitVo } from '@/types/api'
 import './index.scss'
 
 export default function Index() {
   const [quota, setQuota] = useState<QuotaVo | null>(null)
   const [records, setRecords] = useState<SubmitVo[]>([])
+  const [student, setStudent] = useState<StudentVo | null>(null)
   const [loading, setLoading] = useState(true)
 
   useDidShow(() => {
@@ -22,7 +23,14 @@ export default function Index() {
     setLoading(true)
     try {
       await ensureLogin()
-      const [q, list] = await Promise.all([quotaToday(), listSubmits({ size: 5 })])
+      // 多孩必选：没选孩子就跳选择页，本页数据先不加载
+      const active = await ensureActiveStudent()
+      if (!active) return
+      setStudent(active)
+      const [q, list] = await Promise.all([
+        quotaToday(),
+        listSubmits({ studentId: active.id, size: 5 }),
+      ])
       setQuota(q)
       setRecords(list.records)
     } catch {
@@ -56,11 +64,18 @@ export default function Index() {
     Taro.navigateTo({ url: `/pages/result/result?submitId=${record.submitId}` })
   }
 
-  const student = userStore.getStudent()
+  const studentCount = userStore.getStudents().length
 
   return (
     <View className="page index">
       <View className="hero">
+        <View
+          className="kid-chip"
+          onClick={() => Taro.navigateTo({ url: '/pages/children/children' })}
+        >
+          {student ? student.name : '宝贝'}
+          {studentCount > 1 && <Text className="kid-chip-switch">切换</Text>}
+        </View>
         <View className="hero-title">拍照改作业</View>
         <View className="hero-sub">
           {student ? `${student.name} · 今天已批改 ${quota?.used ?? 0} 次` : '拍张照，几秒出结果'}
@@ -72,9 +87,9 @@ export default function Index() {
       </View>
 
       <View className="primary-action" onClick={goCapture}>
-        <View className="primary-action-icon">📷</View>
         <View className="primary-action-main">拍照批改</View>
-        <View className="primary-action-sub">支持一次拍 1~4 页 · 小学语数英</View>
+        <View className="primary-action-sub">对错几秒出 · 错题自动收进本子</View>
+        <View className="primary-action-arrow">→</View>
       </View>
 
       <View className="card">

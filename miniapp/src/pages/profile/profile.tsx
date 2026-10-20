@@ -13,6 +13,7 @@ import './profile.scss'
 export default function Profile() {
   const [user, setUser] = useState<UserVo | null>(null)
   const [student, setStudent] = useState<StudentVo | null>(null)
+  const [students, setStudents] = useState<StudentVo[]>([])
   const [quota, setQuota] = useState<QuotaVo | null>(null)
   const [stats, setStats] = useState<MistakeStatsVo | null>(null)
   const [identity, setIdentity] = useState('')
@@ -25,8 +26,9 @@ export default function Profile() {
     try {
       await ensureLogin()
       setUser(userStore.getUser())
-      setStudent(userStore.getStudent())
-      const studentId = userStore.getStudent()?.id
+      setStudents(userStore.getStudents())
+      setStudent(userStore.getActiveStudent())
+      const studentId = userStore.getActiveStudent()?.id
       const [q, s] = await Promise.all([quotaToday(), mistakeStats(studentId)])
       setQuota(q)
       setStats(s)
@@ -71,6 +73,16 @@ export default function Profile() {
           <Text className="muted mt8">
             {student ? `${student.name} · ${gradeLabel(student.grade)}` : '还没有孩子档案'}
           </Text>
+        </View>
+      </View>
+
+      <View className="card kids-entry" onClick={() => Taro.navigateTo({ url: '/pages/children/children' })}>
+        <View className="row-between">
+          <Text className="title">孩子管理</Text>
+          <Text className="muted">{students.length} 个孩子 ›</Text>
+        </View>
+        <View className="muted mt8">
+          添加孩子、切换当前，或用编号绑定家人共享的孩子
         </View>
       </View>
 

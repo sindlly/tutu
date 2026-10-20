@@ -18,6 +18,10 @@ export interface StudentVo {
   name: string
   grade: number
   school?: string
+  /** 孩子编号，分享给家人即可绑定同一孩子、共享错题数据 */
+  bindCode?: string
+  /** 当前用户是否创建者（可改档案），绑定的家人只读 */
+  owner: boolean
 }
 
 export interface LoginVo {
@@ -25,7 +29,10 @@ export interface LoginVo {
   expiresInSeconds: number
   newUser: boolean
   user: UserVo
+  /** 兼容字段：默认孩子。多孩时以 students + 前端选择为准 */
   student: StudentVo
+  /** 可访问的全部孩子（创建的 + 绑定的），多孩选择靠它 */
+  students: StudentVo[]
 }
 
 export interface UploadedFileVo {

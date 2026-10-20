@@ -1,7 +1,7 @@
 import Taro from '@tarojs/taro'
 import { getToken, request, setToken } from './request'
 import { userStore } from '@/store/user'
-import type { LoginVo } from '@/types/api'
+import type { LoginVo, StudentVo } from '@/types/api'
 
 const DEV_IDENTITY_KEY = 'dev_identity'
 
@@ -71,6 +71,25 @@ export async function ensureLogin(params: LoginParams = {}): Promise<LoginVo | n
   }
   const result = await login(params)
   setToken(result.token)
-  userStore.save(result.user, result.student)
+  userStore.save(result.user, result.students)
   return result
+}
+
+/**
+ * 确保已选中当前孩子。
+ *
+ * 多孩必选门槛：有多个孩子且还没选时，跳去选择页并返回 null ——
+ * 调用方应当立刻中止本次加载（数据没有孩子维度就没法过滤）。
+ * 单孩用户自动选中，永远不感知这一步。
+ */
+export async function ensureActiveStudent(): Promise<StudentVo | null> {
+  const active = userStore.getActiveStudent()
+  if (active) {
+    return active
+  }
+  if (userStore.getStudents().length > 1) {
+    Taro.navigateTo({ url: '/pages/child-select/child-select' })
+    return null
+  }
+  return null
 }

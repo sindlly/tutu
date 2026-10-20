@@ -25,6 +25,8 @@ public record StorageProperties(
 
     public record Minio(
             @DefaultValue("") String endpoint,
+            /** 预签名 URL 用的对外地址。Host 参与签名，容器部署时内外地址不同，必须分开 */
+            @DefaultValue("") String presignEndpoint,
             @DefaultValue("") String accessKey,
             @DefaultValue("") String secretKey,
             @DefaultValue("homework-grader") String bucket,
