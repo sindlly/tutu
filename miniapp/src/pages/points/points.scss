@@ -1,0 +1,222 @@
+.points {
+  padding-bottom: 60px;
+}
+
+/* 余额汇总卡 */
+.sum-card {
+  text-align: center;
+}
+
+.sum-main {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+}
+
+.sum-num {
+  font-size: 96px;
+  font-weight: 700;
+  color: #c96442;
+  line-height: 1.1;
+  font-family: -apple-system, "PingFang SC", "Helvetica Neue", sans-serif;
+}
+
+.sum-unit {
+  margin-left: 10px;
+  font-size: 28px;
+  color: #87867f;
+}
+
+.sum-stats {
+  display: flex;
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 2px dashed rgba(141, 152, 146, 0.3);
+}
+
+.sum-stat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.sum-stat-num {
+  font-size: 30px;
+  font-weight: 600;
+  color: #3d3d3a;
+}
+
+.sum-stat-label {
+  margin-top: 6px;
+  font-size: 22px;
+  color: #87867f;
+}
+
+/* 奖励/兑换表单 */
+.adjust-entry {
+  margin-top: 8px;
+}
+
+.form-card {
+  margin-top: 8px;
+}
+
+.form-title {
+  font-size: 32px;
+  font-weight: 600;
+  font-family: -apple-system, "PingFang SC", "Helvetica Neue", sans-serif;
+}
+
+.quick-row {
+  display: flex;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.quick-cell {
+  flex: 1;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 10px;
+  background: rgba(245, 244, 237, 0.6);
+  font-size: 28px;
+  color: #4e7a40;
+
+  &.quick-spend {
+    color: #c96442;
+  }
+
+  &:active {
+    border-color: #c96442;
+  }
+}
+
+.form-line {
+  display: flex;
+  align-items: center;
+  margin-top: 24px;
+}
+
+.form-input {
+  background: rgba(245, 244, 237, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 32px;
+  height: 88px;
+  padding: 0 24px;
+  font-size: 30px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.form-input + .form-input {
+  margin-top: 20px;
+}
+
+.form-input-delta {
+  width: 180px;
+  text-align: center;
+  font-weight: 700;
+}
+
+.form-label {
+  margin-left: 16px;
+  color: #87867f;
+  font-size: 26px;
+}
+
+.form-btn {
+  margin-top: 32px;
+
+  &.disabled {
+    opacity: 0.6;
+  }
+}
+
+.form-cancel {
+  text-align: center;
+  margin-top: 20px;
+
+  &:active {
+    color: #c96442;
+  }
+}
+
+/* 流水 */
+.log-head {
+  font-size: 32px;
+  font-weight: 600;
+  margin: 16px 8px 24px;
+  font-family: -apple-system, "PingFang SC", "Helvetica Neue", sans-serif;
+}
+
+.log-row {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 32px;
+  padding: 24px 28px;
+  margin-bottom: 14px;
+}
+
+.log-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.log-title {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.log-tag {
+  flex-shrink: 0;
+  padding: 2px 12px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.8);
+  color: #87867f;
+  font-size: 20px;
+  margin-right: 12px;
+}
+
+.log-reason {
+  font-size: 28px;
+  color: #141413;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.log-time {
+  margin-top: 8px;
+}
+
+.log-delta {
+  margin-left: 16px;
+  font-size: 34px;
+  font-weight: 700;
+  font-family: -apple-system, "PingFang SC", "Helvetica Neue", sans-serif;
+
+  &.log-plus {
+    color: #4e7a40;
+  }
+
+  &.log-minus {
+    /* 财务惯例：扣分用红 */
+    color: #b53333;
+  }
+}
+
+.load-more {
+  text-align: center;
+  padding: 24px 0;
+
+  &:active {
+    color: #c96442;
+  }
+}

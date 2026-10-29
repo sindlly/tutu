@@ -2,90 +2,317 @@
   padding-bottom: 40px;
 }
 
+/* 看板头部：小标语 + 大标题 + 孩子胶囊（右侧） */
 .hero {
-  padding: 16px 8px 32px;
+  padding: 8px 4px 28px;
 }
 
-.hero-title {
-  font-size: 52px;
-  font-weight: 700;
-  letter-spacing: 4px;
-  font-family: "Songti SC", "STSong", "Noto Serif SC", serif;
-}
-
-.hero-sub {
-  margin-top: 12px;
-  color: #8b8171;
-  font-size: 26px;
-}
-
-/* 可用次数：红笔写在本子上的数字 */
-.quota {
-  margin-top: 28px;
-  display: flex;
-  align-items: baseline;
-}
-
-.quota-num {
-  font-size: 72px;
-  font-weight: 700;
-  color: #d2402e;
-  line-height: 1;
-  font-family: "Songti SC", "STSong", "Noto Serif SC", serif;
-}
-
-.quota-label {
-  margin-left: 12px;
-  color: #8b8171;
-  font-size: 26px;
-}
-
-/* 主行动区：一张红底「作业本封面」，内圈白虚线是相纸边框 */
-.primary-action {
-  position: relative;
-  background: #d2402e;
-  border-radius: 12px;
-  padding: 48px 36px;
-  color: #fffdf6;
-
-  &:active {
-    background: #b8341f;
-  }
-}
-
-.primary-action-main {
-  font-size: 44px;
-  font-weight: 700;
-  letter-spacing: 6px;
-  font-family: "Songti SC", "STSong", "Noto Serif SC", serif;
-}
-
-.primary-action-sub {
-  margin-top: 12px;
+.hero-eyebrow {
   font-size: 24px;
-  opacity: 0.85;
+  color: #87867f;
   letter-spacing: 1px;
 }
 
-.primary-action-arrow {
-  position: absolute;
-  right: 36px;
-  bottom: 48px;
-  font-size: 44px;
-  font-weight: 300;
-  color: rgba(255, 253, 246, 0.85);
-}
-
-.record {
+.hero-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin-top: 10px;
+}
+
+.hero-title {
+  font-size: 56px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  line-height: 1.1;
+  /* 衬线书名感（Anthropic Serif → 宋体栈） */
+  font-family: "Songti SC", "STSong", "Noto Serif SC", Georgia, serif;
+}
+
+.hero-quote {
+  margin-top: 20px;
+  font-size: 24px;
+  line-height: 1.6;
+  color: rgba(20, 20, 19, 0.62);
+  font-family: "Songti SC", "STSong", "Noto Serif SC", Georgia, serif;
+}
+
+.hero-pill {
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 999px;
+  padding: 10px 26px;
+  font-size: 26px;
+  font-weight: 500;
+  color: rgba(20, 20, 19, 0.62);
+  backdrop-filter: blur(20px) saturate(1.3);
+  -webkit-backdrop-filter: blur(20px) saturate(1.3);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  transition: all 0.18s ease;
+
+  &:active {
+    border-color: #c96442;
+    transform: scale(0.97);
+  }
+}
+
+/* 资产卡：薄荷玻璃 + 微旋转 -0.6°——像随手贴上去的便签（整卡可点） */
+.asset-card {
+  background: rgba(221, 245, 232, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 46px;
+  padding: 32px 36px;
+  margin-bottom: 36px;
+  backdrop-filter: blur(20px) saturate(1.3);
+  -webkit-backdrop-filter: blur(20px) saturate(1.3);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 12px 32px rgba(78, 122, 64, 0.12);
+  transform: rotate(-0.6deg);
+  transition: all 0.18s ease;
+
+  &:active {
+    background: rgba(221, 245, 232, 0.85);
+    transform: rotate(-0.6deg) scale(0.98);
+  }
+}
+
+.asset-label {
+  font-size: 24px;
+  /* 字阶靠透明度：薄荷底上的墨绿说明字 62% */
+  color: rgba(47, 92, 70, 0.62);
+}
+
+.asset-main {
+  display: flex;
+  align-items: baseline;
+  margin-top: 8px;
+}
+
+.asset-num {
+  font-size: 96px;
+  font-weight: 600;
+  color: #c96442;
+  line-height: 1.05;
+  /* 大数字 = 书封上的定价，衬线（不要等宽，Claude 的 Mono 只给代码） */
+  font-family: "Songti SC", "STSong", "Noto Serif SC", Georgia, serif;
+}
+
+.asset-unit {
+  margin-left: 10px;
+  font-size: 28px;
+  color: rgba(47, 92, 70, 0.62);
+}
+
+.asset-foot {
+  display: flex;
+  align-items: center;
+  margin-top: 16px;
+  font-size: 24px;
+  color: rgba(47, 92, 70, 0.62);
+}
+
+.asset-dot {
+  margin: 0 12px;
+}
+
+.asset-more {
+  margin-left: auto;
+  color: #c96442;
+}
+
+/* 区块头 */
+.section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 0 4px 20px;
+}
+
+.section-title {
+  font-size: 32px;
+  font-weight: 600;
+  font-family: "Songti SC", "STSong", "Noto Serif SC", Georgia, serif;
+}
+
+.section-more {
+  font-size: 24px;
+  color: #87867f;
+
+  &:active {
+    color: #c96442;
+  }
+}
+
+/* 任务快览：雾蓝玻璃，紧凑行（完整管理在任务 tab） */
+.task-brief {
+  background: rgba(228, 236, 252, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 32px;
+  padding: 8px 28px;
+  margin-bottom: 36px;
+  backdrop-filter: blur(20px) saturate(1.3);
+  -webkit-backdrop-filter: blur(20px) saturate(1.3);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    0 8px 24px rgba(20, 20, 19, 0.06);
+}
+
+.brief-row {
+  display: flex;
+  align-items: center;
   padding: 24px 0;
-  border-bottom: 2px solid #e7dfcc;
+  border-bottom: 2px solid #f0eee6;
 
   &:last-child {
     border-bottom: none;
-    padding-bottom: 0;
+  }
+
+  &:active {
+    opacity: 0.7;
+  }
+
+  &.brief-done {
+    .brief-title {
+      text-decoration: line-through;
+      text-decoration-color: rgba(201, 100, 66, 0.6);
+      text-decoration-thickness: 3px;
+      color: #87867f;
+    }
+
+    .brief-points {
+      color: #b0aea5;
+    }
+  }
+}
+
+.brief-check {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 3px solid #d1cfc5;
+  margin-right: 22px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #faf9f5;
+  font-size: 30px;
+  font-weight: 700;
+
+  &.brief-check-on {
+    background: #c96442;
+    border-color: #c96442;
+  }
+}
+
+.brief-title {
+  flex: 1;
+  min-width: 0;
+  font-size: 29px;
+  color: #141413;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.brief-points {
+  margin-left: 16px;
+  font-size: 28px;
+  font-weight: 600;
+  color: #c96442;
+  font-family: -apple-system, "PingFang SC", "Helvetica Neue", sans-serif;
+}
+
+/* 任务详情图缩略图（点看大图，不影响行点击打卡） */
+.brief-thumb {
+  width: 64px;
+  height: 64px;
+  border-radius: 12px;
+  margin-left: 20px;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+}
+
+.empty.small {
+  padding: 32px 0;
+  font-size: 24px;
+}
+
+/* 主行动横幅：蜜桃玻璃 + 微旋转 +0.6°，赤陶字——全页唯一暖色高亮（Brand CTA 时刻） */
+.banner {
+  position: relative;
+  background: rgba(255, 224, 205, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 46px;
+  padding: 44px 36px;
+  color: #8a4630;
+  margin-bottom: 36px;
+  backdrop-filter: blur(20px) saturate(1.3);
+  -webkit-backdrop-filter: blur(20px) saturate(1.3);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 12px 32px rgba(201, 100, 66, 0.18);
+  transform: rotate(0.6deg);
+  transition: all 0.18s ease;
+
+  &:active {
+    background: #b0563a;
+    transform: scale(0.98);
+  }
+}
+
+.banner-main {
+  display: flex;
+  align-items: center;
+  font-size: 42px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  line-height: 1.2;
+  font-family: "Songti SC", "STSong", "Noto Serif SC", Georgia, serif;
+
+  > Text {
+    margin-left: 16px;
+  }
+}
+
+.banner-sub {
+  margin-top: 12px;
+  font-size: 24px;
+  /* 字阶靠透明度：蜜桃底上的赤陶深字 62% */
+  color: rgba(138, 70, 48, 0.62);
+}
+
+.banner-arrow {
+  position: absolute;
+  right: 36px;
+  top: 50%;
+  margin-top: -22px;
+}
+
+/* 最近批改：纯白玻璃行 + 状态胶囊 */
+.record-list {
+  margin-bottom: 24px;
+}
+
+.record-card {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 32px;
+  padding: 28px 32px;
+  margin-bottom: 16px;
+  backdrop-filter: blur(20px) saturate(1.3);
+  -webkit-backdrop-filter: blur(20px) saturate(1.3);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    0 4px 16px rgba(20, 20, 19, 0.05);
+  transition: all 0.18s ease;
+
+  &:active {
+    background: rgba(255, 255, 255, 0.8);
+    transform: scale(0.98);
   }
 }
 
@@ -99,16 +326,38 @@
   font-weight: 500;
 }
 
+.record-sub {
+  margin-top: 8px;
+}
+
 .record-right {
   margin-left: 20px;
 }
 
-/* 分数：老师的红笔分 */
-.score {
+/* 状态胶囊：对错待核对的双通道延续（颜色+文字），字重 600 */
+.pill {
+  padding: 6px 20px;
+  border-radius: 999px;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.pill-wrong {
+  background: #f6e7e4;
+  color: #b53333;
+}
+
+.pill-running {
+  background: #f2ecdc;
+  color: #b07818;
+}
+
+/* 分数：批改结果的大数字，衬线书感 */
+.record-score {
   font-size: 40px;
-  font-weight: 700;
-  color: #d2402e;
-  font-family: "Songti SC", "STSong", "Noto Serif SC", serif;
+  font-weight: 600;
+  color: #c96442;
+  font-family: "Songti SC", "STSong", "Noto Serif SC", Georgia, serif;
 }
 
 .tips {

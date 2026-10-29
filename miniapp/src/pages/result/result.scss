@@ -19,24 +19,25 @@
   line-height: 1.1;
 
   &.ok {
-    color: #1f8a5d;
+    color: #4e7a40;
   }
 
   &.bad {
-    color: #d2402e;
+    /* 语义红：孩子的错误答案 */
+    color: #b53333;
   }
 }
 
 .summary-label {
   margin-top: 8px;
   font-size: 24px;
-  color: #8b8171;
+  color: #87867f;
 }
 
 .notice {
-  background: #f7efdc;
+  background: #f2ecdc;
   color: #b07818;
-  border-radius: 12px;
+  border-radius: 32px;
   padding: 20px;
   font-size: 26px;
   line-height: 1.5;
@@ -51,8 +52,8 @@
 .original-img {
   width: 160px;
   height: 220px;
-  border-radius: 12px;
-  background: #e7dfcc;
+  border-radius: 32px;
+  background: rgba(255, 255, 255, 0.8);
   flex-shrink: 0;
 }
 
@@ -65,27 +66,28 @@
 .filter {
   padding: 12px 32px;
   border-radius: 999px;
-  background: #fffdf6;
-  color: #4a463e;
+  background: rgba(255, 255, 255, 0.62);
+  color: #3d3d3a;
   font-size: 28px;
 }
 
 .filter-active {
-  background: #d2402e;
-  color: #fff;
+  background: #c96442;
+  color: #faf9f5;
   font-weight: 600;
 }
 
 .q {
-  background: #fffdf6;
-  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.62);
+  border-radius: 32px;
   padding: 28px 32px;
   margin-bottom: 20px;
-  border: 1px solid #e8dfc9;
-  border-left: 8px solid #e7dfcc;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-left: 8px solid #f0eee6;
 
   &.q-wrong {
-    border-left-color: #d2402e;
+    /* 错题卡左边框：语义红 */
+    border-left-color: #b53333;
   }
 }
 
@@ -102,7 +104,7 @@
 
 .q-arrow {
   margin-left: auto;
-  color: #8b8171;
+  color: #87867f;
   font-size: 32px;
   padding-left: 16px;
 }
@@ -124,7 +126,7 @@
 .q-label {
   width: 150px;
   flex-shrink: 0;
-  color: #8b8171;
+  color: #87867f;
   font-size: 26px;
 }
 
@@ -133,12 +135,12 @@
   word-break: break-all;
 
   &.ok {
-    color: #1f8a5d;
+    color: #4e7a40;
     font-weight: 600;
   }
 
   &.bad {
-    color: #d2402e;
+    color: #b53333;
     font-weight: 600;
   }
 }
@@ -146,7 +148,7 @@
 .q-detail {
   margin-top: 20px;
   padding-top: 20px;
-  border-top: 2px solid #e7dfcc;
+  border-top: 2px solid #f0eee6;
 }
 
 .q-block {
@@ -158,7 +160,7 @@
   margin-top: 6px;
   font-size: 28px;
   line-height: 1.65;
-  color: #4a463e;
+  color: #3d3d3a;
 }
 
 .q-tags {
@@ -176,8 +178,8 @@
 .q-crop-img {
   margin-top: 12px;
   width: 100%;
-  border-radius: 12px;
-  background: #e7dfcc;
+  border-radius: 32px;
+  background: rgba(255, 255, 255, 0.8);
 }
 
 .crop-mask {

@@ -17,10 +17,13 @@ public class AppFile {
     public static final int BIZ_MISTAKE_CROP = 2;
     public static final int BIZ_MISTAKE_CARD = 3;
     public static final int BIZ_AVATAR = 4;
+    public static final int BIZ_TASK_PROOF = 5;
+    /** 任务详情图：家长布置任务时配的图（作业页照片、手写任务卡）。 */
+    public static final int BIZ_TASK_IMAGE = 6;
 
     /** 允许客户端主动上传的类型。错题裁剪图/卡片由服务端生成，不接受客户端指定。 */
     public static final java.util.Set<Integer> CLIENT_UPLOAD_BIZ_TYPES =
-            java.util.Set.of(BIZ_HOMEWORK_IMAGE, BIZ_AVATAR);
+            java.util.Set.of(BIZ_HOMEWORK_IMAGE, BIZ_AVATAR, BIZ_TASK_PROOF, BIZ_TASK_IMAGE);
 
     @TableId(type = IdType.AUTO)
     private Long id;

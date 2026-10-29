@@ -15,7 +15,7 @@
     <artifactId>homework-grader</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>homework-grader</name>
-    <description>拍照批改作业小程序后端</description>
+    <description>java学习拍照批改作业小程序后端</description>
 
     <properties>
         <java.version>21</java.version>

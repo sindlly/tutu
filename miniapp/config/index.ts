@@ -28,7 +28,10 @@ export default defineConfig(async (merge) => {
     plugins: [],
     defineConstants: {},
     copy: {
-      patterns: [],
+      patterns: [
+        // tabBar 图标不走 webpack（app.config 里的 iconPath 不会被打包器处理），直接整目录拷进 dist
+        { from: 'src/assets/tabbar/', to: 'dist/assets/tabbar/' },
+      ],
       options: {},
     },
     framework: 'react',

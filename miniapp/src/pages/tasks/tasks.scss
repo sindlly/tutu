@@ -1,0 +1,460 @@
+.tasks {
+  padding-bottom: 60px;
+}
+
+/* 积分卡：老师红笔写的分数 */
+.score-card {
+  display: flex;
+  align-items: center;
+}
+
+.score-main {
+  display: flex;
+  align-items: baseline;
+  margin-right: 28px;
+}
+
+.score-num {
+  font-size: 84px;
+  font-weight: 700;
+  color: #c96442;
+  line-height: 1;
+  font-family: -apple-system, "PingFang SC", "Helvetica Neue", sans-serif;
+}
+
+.score-unit {
+  margin-left: 8px;
+  font-size: 26px;
+  color: #87867f;
+}
+
+.score-side {
+  flex: 1;
+  min-width: 0;
+}
+
+.score-line {
+  font-size: 26px;
+  color: #141413;
+}
+
+.score-ops {
+  margin-top: 12px;
+  color: #b07818;
+  font-size: 24px;
+
+  &:active {
+    color: #c96442;
+  }
+}
+
+/* 任务行：一张作业纸条 */
+.task-list {
+  margin-bottom: 24px;
+}
+
+.task-row {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 32px;
+  padding: 26px 28px;
+  margin-bottom: 16px;
+  backdrop-filter: blur(20px) saturate(1.3);
+  -webkit-backdrop-filter: blur(20px) saturate(1.3);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    0 4px 16px rgba(20, 20, 19, 0.05);
+
+  &:active {
+    background: rgba(255, 255, 255, 0.8);
+  }
+
+  &.task-done {
+    background: rgba(245, 244, 237, 0.6);
+    border-color: rgba(255, 255, 255, 0.9);
+  }
+}
+
+/* 打卡勾：老师的红笔勾 */
+.task-check {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 3px solid #d1cfc5;
+  color: #c96442;
+  font-size: 38px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 24px;
+  flex-shrink: 0;
+
+  &.task-check-on {
+    border-color: #c96442;
+    background: #c96442;
+    color: #faf9f5;
+  }
+
+  /* 刚打上勾时：红笔落下的顿挫感 */
+  &.pop {
+    animation: pen-pop 0.45s cubic-bezier(0.2, 1.6, 0.4, 1);
+  }
+}
+
+@keyframes pen-pop {
+  0% {
+    transform: scale(0.4);
+  }
+  55% {
+    transform: scale(1.25);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.task-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.task-title {
+  font-size: 30px;
+  color: #141413;
+
+  .task-done & {
+    /* 老师改完那道的删除线 */
+    text-decoration: line-through;
+    text-decoration-color: rgba(201, 100, 66, 0.6);
+    text-decoration-thickness: 3px;
+    color: #87867f;
+  }
+}
+
+.task-time {
+  margin-top: 6px;
+  font-size: 22px;
+  color: #87867f;
+}
+
+.task-points {
+  font-size: 30px;
+  font-weight: 600;
+  color: #c96442;
+  margin-left: 16px;
+  font-family: -apple-system, "PingFang SC", "Helvetica Neue", sans-serif;
+
+  &.task-points-done {
+    color: #b0aea5;
+  }
+}
+
+/* 任务详情图缩略图：点缩略图看大图（点行打卡） */
+.task-thumb {
+  width: 96px;
+  height: 96px;
+  border-radius: 16px;
+  margin-left: 20px;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+}
+
+/* 表单：任务配图选择区 */
+.form-image-row {
+  margin-top: 24px;
+}
+
+.form-image-box {
+  position: relative;
+  display: inline-block;
+}
+
+.form-image {
+  width: 160px;
+  height: 160px;
+  border-radius: 16px;
+  display: block;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+}
+
+.form-image-remove {
+  position: absolute;
+  top: -14px;
+  right: -14px;
+  width: 48px;
+  height: 48px;
+  line-height: 44px;
+  text-align: center;
+  border-radius: 50%;
+  background: rgba(20, 20, 19, 0.55);
+  color: #faf9f5;
+  font-size: 30px;
+}
+
+.form-image-add {
+  width: 160px;
+  height: 160px;
+  border-radius: 16px;
+  border: 2px dashed #d1cfc5;
+  background: rgba(245, 244, 237, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:active {
+    border-color: #c96442;
+  }
+}
+
+.form-image-add-txt {
+  font-size: 22px;
+  color: #87867f;
+  text-align: center;
+  line-height: 1.5;
+  white-space: pre-line;
+}
+
+/* 添加任务 */
+.add-entry {
+  margin-top: 8px;
+}
+
+.form-card {
+  margin-top: 8px;
+}
+
+.form-input {
+  background: rgba(245, 244, 237, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 32px;
+  height: 88px;
+  padding: 0 24px;
+  font-size: 30px;
+}
+
+.form-row2 {
+  display: flex;
+  align-items: center;
+  margin-top: 24px;
+}
+
+.form-input-points {
+  width: 140px;
+  text-align: center;
+  font-weight: 700;
+}
+
+.form-points-label {
+  margin: 0 20px 0 12px;
+  color: #87867f;
+  font-size: 26px;
+}
+
+.form-add {
+  flex: 1;
+  height: 88px;
+  line-height: 88px;
+
+  &.disabled {
+    opacity: 0.6;
+  }
+}
+
+.form-cancel {
+  text-align: center;
+  margin-top: 20px;
+
+  &:active {
+    color: #c96442;
+  }
+}
+
+.tips {
+  margin-top: 24px;
+  text-align: center;
+}
+
+/* ===== 今日/历史 视图切换 ===== */
+.seg {
+  display: flex;
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 32px;
+  padding: 6px;
+  margin-bottom: 24px;
+  backdrop-filter: blur(20px) saturate(1.3);
+  -webkit-backdrop-filter: blur(20px) saturate(1.3);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    0 4px 16px rgba(20, 20, 19, 0.06);
+}
+
+.seg-btn {
+  flex: 1;
+  text-align: center;
+  height: 72px;
+  line-height: 72px;
+  border-radius: 32px;
+  font-size: 28px;
+  color: #5e5d59;
+  transition: all 0.18s ease;
+
+  &.seg-on {
+    background: #c96442;
+    color: #faf9f5;
+    font-weight: 600;
+  }
+}
+
+/* ===== 历史视图 ===== */
+.history {
+  /* 天/周/月 tab */
+  .range-tabs {
+    display: flex;
+    background: rgba(255, 255, 255, 0.62);
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    border-radius: 32px;
+    padding: 6px;
+    margin-bottom: 20px;
+  }
+
+  .range-btn {
+    flex: 1;
+    text-align: center;
+    height: 60px;
+    line-height: 60px;
+    border-radius: 32px;
+    font-size: 26px;
+    color: #5e5d59;
+
+    &.range-on {
+      background: #e8e6dc;
+      color: #141413;
+      font-weight: 600;
+    }
+  }
+
+  /* 区间前后翻页 */
+  .hist-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 4px 20px;
+  }
+
+  .hist-arrow {
+    width: 72px;
+    height: 72px;
+    line-height: 66px;
+    text-align: center;
+    font-size: 40px;
+    color: #87867f;
+    border-radius: 50%;
+
+    &:active {
+      color: #c96442;
+      background: rgba(255, 255, 255, 0.8);
+    }
+  }
+
+  .hist-label {
+    font-size: 30px;
+    font-weight: 600;
+    color: #141413;
+    font-family: "Songti SC", "STSong", "Noto Serif SC", Georgia, serif;
+    /* 可点选日期的暗示：虚线下划线 + 小箭头 */
+    padding: 0 20px 6px;
+    border-bottom: 2px dashed rgba(20, 20, 19, 0.2);
+
+    &:active {
+      color: #c96442;
+      border-bottom-color: rgba(201, 100, 66, 0.4);
+    }
+  }
+
+  .hist-caret {
+    margin-left: 10px;
+    font-size: 20px;
+    color: #87867f;
+  }
+
+  .hist-summary {
+    padding: 0 4px 20px;
+    font-size: 24px;
+    color: #87867f;
+  }
+
+  /* 记录行：凭证缩略图 + 任务名 + 积分 */
+  .hist-row {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.62);
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    border-radius: 32px;
+    padding: 20px 24px;
+    margin-bottom: 16px;
+    backdrop-filter: blur(20px) saturate(1.3);
+    -webkit-backdrop-filter: blur(20px) saturate(1.3);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.85),
+      0 4px 16px rgba(20, 20, 19, 0.05);
+    transition: all 0.18s ease;
+
+    &:active {
+      background: rgba(255, 255, 255, 0.8);
+    }
+  }
+
+  .hist-thumb {
+    width: 120px;
+    height: 120px;
+    border-radius: 32px;
+    flex-shrink: 0;
+    margin-right: 24px;
+    background: rgba(245, 244, 237, 0.6);
+  }
+
+  .hist-thumb-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px dashed #d1cfc5;
+    box-sizing: border-box;
+  }
+
+  .hist-thumb-txt {
+    font-size: 22px;
+    color: #b0aea5;
+  }
+
+  .hist-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .hist-title {
+    font-size: 28px;
+    color: #141413;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .hist-time {
+    margin-top: 8px;
+    font-size: 22px;
+    color: #87867f;
+  }
+
+  .hist-points {
+    margin-left: 16px;
+    font-size: 28px;
+    font-weight: 600;
+    color: #c96442;
+    flex-shrink: 0;
+  }
+}

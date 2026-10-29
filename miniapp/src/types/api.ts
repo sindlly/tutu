@@ -24,6 +24,79 @@ export interface StudentVo {
   owner: boolean
 }
 
+/** 首页每日美句（DeepSeek 生成，符合孩子年级） */
+export interface DailyQuoteVo {
+  date: string
+  grade: number
+  text: string
+}
+
+/** 「每日一话」生成的美文 */
+export interface EssayVo {
+  text: string
+}
+
+/** 每日任务面板（某孩子今天） */
+export interface TaskTodayVo {
+  date: string
+  tasks: TaskItemVo[]
+  summary: {
+    balance: number
+    todayEarned: number
+    todayCompleted: number
+    todayTotal: number
+  }
+}
+
+export interface TaskItemVo {
+  id: number
+  title: string
+  points: number
+  completed: boolean
+  completedAt?: string | null
+  /** 任务详情图（作业页照片/手写任务卡；服务端 presign，短时效；无图为 null） */
+  imageUrl?: string | null
+}
+
+/** 任务打卡历史（按天/周/月查询） */
+export interface TaskCompletionsVo {
+  range: 'day' | 'week' | 'month'
+  start: string
+  end: string
+  items: TaskCompletionVo[]
+  summary: {
+    count: number
+    earned: number
+  }
+}
+
+export interface TaskCompletionVo {
+  id: number
+  taskId: number
+  taskTitle: string
+  pointsAwarded: number
+  completeDate: string
+  completedAt: string
+  /** 任务详情图（服务端 presign，短时效；无图为 null） */
+  imageUrl?: string | null
+}
+
+export interface PointsSummaryVo {
+  balance: number
+  todayEarned: number
+  totalEarned: number
+  totalSpent: number
+}
+
+export interface PointsLogVo {
+  id: number
+  delta: number
+  source: number
+  sourceLabel: string
+  reason?: string | null
+  createdAt: string
+}
+
 export interface LoginVo {
   token: string
   expiresInSeconds: number

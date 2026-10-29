@@ -22,7 +22,7 @@ npm run dev:weapp       # 开发模式（监听改动）
 npm run typecheck       # 类型检查（构建只剥类型，不做检查）
 ```
 
-页面：首页 / 拍照提交 / 批改进度 / 结果 / 错题本 / 错题详情 / 选孩子 / 孩子管理 / 我的。
+页面：首页 / 拍照提交 / 批改进度 / 结果 / 任务（tab）/ 错题本 / 错题详情 / 积分明细 / 选孩子 / 孩子管理 / 我的。
 
 **导入微信开发者工具**：新建项目 → 目录选 `miniapp/`（`project.config.json` 里 `miniprogramRoot` 已指向 `dist/`）→ 详情里勾选「不校验合法域名…」（因为开发期后端是 `http://127.0.0.1:8080`）。
 
@@ -41,6 +41,38 @@ H5 跨域需要后端开 CORS：`.env` 里设 `CORS_ALLOWED_ORIGINS=http://127.0
 
 - **幂等号只在该提交成功后才清除**（`src/utils/id.ts`）。用户「提交 → 超时 → 再点一次」时会复用同一个 `bizNo`，服务端返回同一任务，不会重复批改、不会重复扣额度。清早了就退化成两次提交。
 - **`uploadFile` 的 CORS**：Taro 在 H5 端的 `uploadFile` 会带 `withCredentials`，后端必须回 `Access-Control-Allow-Credentials: true`，否则预检直接失败。这个是跑起来才发现的，配置里已注明原因。
+
+---
+
+## 每日任务与积分（V3）
+
+孩子每天的「要做的事」+ 完成得积分，家长可动态添加任务、奖励或兑换积分。数据同样挂孩子名下，家人绑定后共享同一份任务与余额（谁打卡都行）。
+
+```
+t_task             任务定义（家长动态添加，status 归档=软删）
+t_task_completion  打卡记录（每天每任务唯一，points 存快照防任务改分影响历史）
+t_points_log       积分流水（余额 = SUM(delta)，唯一事实来源，无冗余余额字段）
+```
+
+接口（`TaskController` / `PointsController`）：
+
+| 方法 | 路径 | 说明 |
+|---|---|---|
+| GET | `/api/v1/tasks/today?studentId=` | 今日面板（任务+打卡状态+积分概览）。首访种默认任务 |
+| POST | `/api/v1/tasks` | 添加任务 {studentId, title, points} |
+| PUT | `/api/v1/tasks/{id}` | 改名字/积分/状态 |
+| POST | `/api/v1/tasks/{id}/complete` | 打卡（幂等，当天重复打不加重复分） |
+| POST | `/api/v1/tasks/{id}/undo` | 撤销今日打卡（写反向流水，账可审计） |
+| POST | `/api/v1/tasks/{id}/archive` | 归档 |
+| GET | `/api/v1/points/summary` / `/logs` | 余额概览 / 流水分页 |
+| POST | `/api/v1/points/adjust` | 家长调整：正数奖励，负数兑换（必须写备注） |
+
+设计要点：
+
+- **跨天零维护**：没有每日重置任务，完成度按 `complete_date = 今天` 过滤自然归零。
+- **打卡与积分同事务**：completion + points_log 一起成或一起不成。
+- **撤销不删历史**：写 `delta=-points` 的反向流水，任何时刻可对账。
+- **默认任务只种一次**：判断「曾创建过任务（含归档）」，家长删光不会被塞回来。
 
 ---
 

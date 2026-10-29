@@ -142,6 +142,19 @@ public class FileService {
         return storageClient.presignedUrl(file.getFileKey());
     }
 
+    /**
+     * 按 fileId 直接 presign，不做 owner 校验。
+     * 仅限服务端已经过业务归属校验的场景（如任务打卡凭证：完成记录已按 studentId
+     * 过滤并校验过访问权，而打卡图片的 owner 是打卡人，家人共享时不等于查询人）。
+     */
+    public String presignById(Long fileId) {
+        AppFile file = fileMapper.selectById(fileId);
+        if (file == null || !Integer.valueOf(1).equals(file.getStatus())) {
+            return null;
+        }
+        return storageClient.presignedUrl(file.getFileKey());
+    }
+
     public long presignExpiresInSeconds() {
         return storageProperties.cos().presignExpire().toSeconds();
     }
@@ -175,6 +188,8 @@ public class FileService {
             case AppFile.BIZ_MISTAKE_CROP -> "mistake-crop";
             case AppFile.BIZ_MISTAKE_CARD -> "mistake-card";
             case AppFile.BIZ_AVATAR -> "avatar";
+            case AppFile.BIZ_TASK_PROOF -> "task-proof";
+            case AppFile.BIZ_TASK_IMAGE -> "task-img";
             default -> "homework";
         };
     }

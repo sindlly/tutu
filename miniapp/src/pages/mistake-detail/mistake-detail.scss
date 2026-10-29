@@ -4,10 +4,10 @@
 
 .card-img {
   width: 100%;
-  border-radius: 20px;
+  border-radius: 32px;
   margin-bottom: 24px;
-  background: #fffdf6;
-  border: 1px solid #e8dfc9;
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.9);
 }
 
 .md-stem {
@@ -25,7 +25,7 @@
 .md-label {
   width: 150px;
   flex-shrink: 0;
-  color: #8b8171;
+  color: #87867f;
   font-size: 26px;
 }
 
@@ -34,12 +34,12 @@
   word-break: break-all;
 
   &.ok {
-    color: #1f8a5d;
+    color: #4e7a40;
     font-weight: 600;
   }
 
   &.bad {
-    color: #d2402e;
+    color: #b53333;
     font-weight: 600;
   }
 }
@@ -53,7 +53,7 @@
   margin-top: 6px;
   font-size: 28px;
   line-height: 1.65;
-  color: #4a463e;
+  color: #3d3d3a;
 }
 
 .md-tags {
@@ -82,20 +82,20 @@
   height: 96px;
   line-height: 96px;
   text-align: center;
-  border-radius: 16px;
+  border-radius: 32px;
   font-size: 32px;
   font-weight: 600;
 
   &.good {
-    background: #e4f2e9;
-    color: #1f8a5d;
-    border: 2px solid #b7eb8f;
+    background: #e7efe2;
+    color: #4e7a40;
+    border: 2px solid #4e7a40;
   }
 
   &.bad {
-    background: #fbe9e4;
-    color: #d2402e;
-    border: 2px solid #e89c8e;
+    background: #e8e6dc;
+    color: #b53333;
+    border: 2px solid #e3b8b2;
   }
 
   &.disabled {
@@ -110,8 +110,8 @@
 
 .crop-img {
   width: 100%;
-  border-radius: 12px;
-  background: #e7dfcc;
+  border-radius: 32px;
+  background: rgba(255, 255, 255, 0.8);
 }
 
 .log {
@@ -119,7 +119,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 16px 0;
-  border-bottom: 2px solid #e7dfcc;
+  border-bottom: 2px solid #f0eee6;
 
   &:last-child {
     border-bottom: none;
@@ -127,12 +127,12 @@
 }
 
 .log-ok {
-  color: #1f8a5d;
+  color: #4e7a40;
   font-weight: 600;
 }
 
 .log-bad {
-  color: #d2402e;
+  color: #b53333;
   font-weight: 600;
 }
 
@@ -143,7 +143,7 @@
 .md-remove {
   margin-top: 24px;
   text-align: center;
-  color: #8b8171;
+  color: #87867f;
   font-size: 28px;
   padding: 20px;
 }
