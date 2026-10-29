@@ -36,6 +36,17 @@ export interface EssayVo {
   text: string
 }
 
+/** 奖励中心条目（家长预设的可兑换奖励） */
+export interface RewardVo {
+  id: number
+  title: string
+  /** 预制卡通图标 key（assets/rewards/{icon}.png；空=默认礼物图） */
+  icon?: string | null
+  cost: number
+  /** 1 上架 2 下架 */
+  status: 1 | 2
+}
+
 /** 每日任务面板（某孩子今天） */
 export interface TaskTodayVo {
   date: string

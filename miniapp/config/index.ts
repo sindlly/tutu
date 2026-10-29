@@ -31,6 +31,8 @@ export default defineConfig(async (merge) => {
       patterns: [
         // tabBar 图标不走 webpack（app.config 里的 iconPath 不会被打包器处理），直接整目录拷进 dist
         { from: 'src/assets/tabbar/', to: 'dist/assets/tabbar/' },
+        // 奖励中心预制卡通图（Image src 相对路径，同 tabbar 机制）
+        { from: 'src/assets/rewards/', to: 'dist/assets/rewards/' },
       ],
       options: {},
     },

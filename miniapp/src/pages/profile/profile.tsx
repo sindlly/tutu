@@ -6,6 +6,7 @@ import { clearAuth, getToken } from '@/services/request'
 import { quotaToday } from '@/services/quota'
 import { mistakeStats } from '@/services/mistake'
 import { userStore } from '@/store/user'
+import Icon from '@/components/Icon'
 import { gradeLabel } from '@/utils/format'
 import type { MistakeStatsVo, QuotaVo, StudentVo, UserVo } from '@/types/api'
 import './profile.scss'
@@ -83,6 +84,33 @@ export default function Profile() {
         </View>
         <View className="muted mt8">
           添加孩子、切换当前，或用编号绑定家人共享的孩子
+        </View>
+      </View>
+
+      {/* 功能入口：任务打卡 / 奖励中心（积分与兑换都在积分页） */}
+      <View className="entry-pair">
+        <View className="card entry-card" onClick={() => Taro.switchTab({ url: '/pages/tasks/tasks' })}>
+          <View className="entry-icon entry-icon-task">
+            <Icon name="calendar-check" size={44} color="#faf9f5" />
+          </View>
+          <View className="entry-body">
+            <Text className="title">每日任务</Text>
+            <View className="muted mt8">每天要做的事，打卡攒积分</View>
+          </View>
+          <Text className="entry-arrow">›</Text>
+        </View>
+        <View
+          className="card entry-card"
+          onClick={() => student && Taro.navigateTo({ url: `/pages/points/points?studentId=${student.id}` })}
+        >
+          <View className="entry-icon entry-icon-reward">
+            <Icon name="gift" size={44} color="#faf9f5" />
+          </View>
+          <View className="entry-body">
+            <Text className="title">奖励中心</Text>
+            <View className="muted mt8">积分明细与可兑换的奖励</View>
+          </View>
+          <Text className="entry-arrow">›</Text>
         </View>
       </View>
 

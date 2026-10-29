@@ -76,6 +76,7 @@
 .kid-row-ops {
   display: flex;
   align-items: center;
+  gap: 24px;
   margin-top: 20px;
   padding-top: 20px;
   border-top: 2px dashed rgba(141, 152, 146, 0.3);
@@ -171,6 +172,24 @@
 
 .form-btn {
   margin-top: 32px;
+
+  &.disabled {
+    opacity: 0.6;
+  }
+}
+
+/* 编辑孩子档案：展开在卡片内，复用添加表单的输入与年级九宫格样式 */
+.kid-edit {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 2px dashed rgba(20, 20, 19, 0.15);
+}
+
+.kid-edit-save {
+  margin-top: 24px;
+  height: 80px;
+  line-height: 80px;
+  font-size: 28px;
 
   &.disabled {
     opacity: 0.6;

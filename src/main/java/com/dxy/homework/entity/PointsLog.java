@@ -20,6 +20,7 @@ public class PointsLog {
 
     public static final int SOURCE_TASK = 1;
     public static final int SOURCE_MANUAL = 2;
+    public static final int SOURCE_REWARD = 3;
 
     @TableId(type = IdType.AUTO)
     private Long id;

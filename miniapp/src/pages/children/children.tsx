@@ -2,7 +2,7 @@ import { View, Text, Input } from '@tarojs/components'
 import Taro, { useDidShow } from '@tarojs/taro'
 import { useState } from 'react'
 import { ensureLogin } from '@/services/auth'
-import { bindStudent, createStudent, listStudents, unbindStudent } from '@/services/student'
+import { bindStudent, createStudent, listStudents, unbindStudent, updateStudent } from '@/services/student'
 import { userStore } from '@/store/user'
 import { gradeLabel } from '@/utils/format'
 import { GRADES } from '@/types/api'
@@ -24,6 +24,10 @@ export default function Children() {
   // 绑定表单
   const [code, setCode] = useState('')
   const [codeFocus, setCodeFocus] = useState(false)
+  // 编辑孩子档案（仅创建者）：名称 + 年级
+  const [editingId, setEditingId] = useState<number | null>(null)
+  const [editName, setEditName] = useState('')
+  const [editGrade, setEditGrade] = useState(3)
 
   useDidShow(() => {
     void load()
@@ -106,6 +110,37 @@ export default function Children() {
     Taro.showToast({ title: `已切换到「${student.name}」`, icon: 'none' })
   }
 
+  function startEdit(student: StudentVo) {
+    setEditingId(student.id)
+    setEditName(student.name)
+    setEditGrade(student.grade)
+  }
+
+  function cancelEdit() {
+    setEditingId(null)
+    setEditName('')
+  }
+
+  async function saveEdit(student: StudentVo) {
+    if (busy) return
+    const name = editName.trim()
+    if (!name) {
+      Taro.showToast({ title: '称呼不能为空', icon: 'none' })
+      return
+    }
+    setBusy(true)
+    try {
+      await updateStudent(student.id, { name, grade: editGrade })
+      await load()
+      setEditingId(null)
+      Taro.showToast({ title: '已更新档案', icon: 'none' })
+    } catch {
+      // 请求层已 toast
+    } finally {
+      setBusy(false)
+    }
+  }
+
   async function copyCode(student: StudentVo) {
     if (!student.bindCode) return
     try {
@@ -143,12 +178,45 @@ export default function Children() {
               <Text className="kid-row-op" onClick={() => copyCode(s)}>
                 编号 {s.bindCode}
               </Text>
+              {s.owner && (
+                <Text className="kid-row-op" onClick={() => (editingId === s.id ? cancelEdit() : startEdit(s))}>
+                  {editingId === s.id ? '收起' : '编辑'}
+                </Text>
+              )}
               {!s.owner && (
                 <Text className="kid-row-op kid-row-unbind" onClick={() => removeBind(s)}>
                   解绑
                 </Text>
               )}
             </View>
+            {editingId === s.id && (
+              <View className="kid-edit">
+                <View className="form-row">
+                  <Input
+                    className="form-input"
+                    value={editName}
+                    maxlength={12}
+                    placeholder="称呼，比如「大宝」"
+                    onInput={(e) => setEditName(e.detail.value)}
+                  />
+                </View>
+                <View className="form-label">年级</View>
+                <View className="grade-grid">
+                  {GRADES.map((g) => (
+                    <View
+                      key={g.value}
+                      className={`grade-cell ${editGrade === g.value ? 'grade-cell-on' : ''}`}
+                      onClick={() => setEditGrade(g.value)}
+                    >
+                      {g.label.replace('年级', '')}
+                    </View>
+                  ))}
+                </View>
+                <View className={`btn-primary kid-edit-save ${busy ? 'disabled' : ''}`} onClick={busy ? undefined : () => saveEdit(s)}>
+                  保存修改
+                </View>
+              </View>
+            )}
           </View>
         ))}
       </View>
