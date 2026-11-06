@@ -15,15 +15,17 @@ const TOKEN_KEY = 'auth_token'
 const USER_KEY = 'auth_user'
 
 /**
- * 后端地址。
+ * 后端地址：编译时通过 TARO_APP_API_BASE 注入，默认本机调试地址。
  *
- * 开发时指向本机：小程序端要在微信开发者工具里勾选「不校验合法域名」。
- * 上线必须换成已备案的 HTTPS 域名，并在小程序后台把域名加进
- * request / uploadFile 合法域名列表 —— 用 IP 会直接被拒。
+ * - 本地联调：npm run dev:weapp（127.0.0.1:8080），开发者工具勾选「不校验合法域名」。
+ * - 线上模式：npm run build:weapp:online / dev:weapp:online（http://www.zycquet.com/tutu，
+ *   走 nginx 反代，见后端 DEPLOY.md；http 阶段同样需要勾「不校验合法域名」或开真机调试）。
+ * - 正式发布：换 https 域名并在小程序后台把域名加进 request / uploadFile 合法域名列表
+ *   —— 用 IP 或未配置域名会被直接拒。
  *
  * H5 端跨域访问时需要后端开启 CORS（见后端 app.cors.allowed-origins）。
  */
-export const API_BASE = 'http://127.0.0.1:8080'
+export const API_BASE = process.env.TARO_APP_API_BASE || 'http://127.0.0.1:8080'
 
 export class ApiError extends Error {
   readonly code: number

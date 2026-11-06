@@ -26,7 +26,14 @@ export default defineConfig(async (merge) => {
       '@': path.resolve(__dirname, '..', 'src'),
     },
     plugins: [],
-    defineConstants: {},
+    // API 地址编译期注入：默认本机调试地址，线上模式用 TARO_APP_API_BASE=xxx 覆盖
+    // （见 package.json 的 *:online 脚本）。不用 Taro 的 .env 注入机制 ——
+    // 那要求仓库里存在 .env 文件，只传 shell 变量不生效，容易踩坑。
+    defineConstants: {
+      'process.env.TARO_APP_API_BASE': JSON.stringify(
+        process.env.TARO_APP_API_BASE ?? 'http://127.0.0.1:8080'
+      ),
+    },
     copy: {
       patterns: [
         // tabBar 图标不走 webpack（app.config 里的 iconPath 不会被打包器处理），直接整目录拷进 dist

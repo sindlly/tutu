@@ -26,7 +26,10 @@ npm run typecheck       # 类型检查（构建只剥类型，不做检查）
 
 **导入微信开发者工具**：新建项目 → 目录选 `miniapp/`（`project.config.json` 里 `miniprogramRoot` 已指向 `dist/`）→ 详情里勾选「不校验合法域名…」（因为开发期后端是 `http://127.0.0.1:8080`）。
 
-**后端地址**在 `src/services/request.ts` 的 `API_BASE`。上线必须换成已备案的 HTTPS 域名，并加进小程序后台的 request / uploadFile 合法域名 —— 用 IP 会被直接拒绝。
+**后端地址**在 `src/services/request.ts` 的 `API_BASE`，编译期注入（`config/index.ts` 的 `defineConstants`）：
+默认脚本是本机 `127.0.0.1:8080`；连线上环境用 `npm run build:weapp:online` / `dev:weapp:online`
+（注入 `http://www.zycquet.com/tutu`，见后端 `DEPLOY.md`）。上线必须换成已备案的 HTTPS 域名，
+并加进小程序后台的 request / uploadFile 合法域名 —— 用 IP 会被直接拒绝。
 
 **H5 调试**（可选，方便在浏览器里看 UI）：
 
@@ -534,3 +537,10 @@ OCR_SECRET_KEY=...
 - 上传接口做了大小限制（20MB）与扩展名白名单，临时文件用完即删
 - 生产化时必须补上：用户越权校验、对象存储私有读 + 预签名 URL、微信内容安全审核（`imgSecCheck` / `msgSecCheck`）、未成年人隐私政策与数据删除入口
 - 作业照片含未成年人信息，**不要提交到 git**，`samples/` 已排除
+
+
+### 部署方案
+我有一台云服务器，如何进行部署？接口使用域名http://www.zycquet.com。 服务器上有nginx 可以使用/tutu 路径进行代理
+
+详见 [DEPLOY.md](./DEPLOY.md)：nginx `/tutu` 反代 API、MinIO 9000 端口直通预签名、
+`.env` 配置清单与上线前 https 域名要求。
