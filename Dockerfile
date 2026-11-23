@@ -11,9 +11,11 @@ COPY src ./src
 RUN --mount=type=cache,target=/root/.m2 mvn -q -B -DskipTests package
 
 FROM eclipse-temurin:21-jre
-# 健康检查要用；顺手清掉 apt 缓存控制体积
+# curl：健康检查要用；fonts-noto-cjk：错题卡片用 Java AWT 画图，容器里没中文字体时
+# 汉字/中文标点会全部画成方块，必须装一个 CJK 字体包（MistakeCardRenderer 会按
+# FONT_CANDIDATES 探测，这里的 Noto Sans CJK SC 命中 "Noto Sans CJK SC"）
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends curl \
+    && apt-get install -y --no-install-recommends curl fonts-noto-cjk \
     && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY --from=build /build/target/homework-grader-0.0.1-SNAPSHOT.jar app.jar

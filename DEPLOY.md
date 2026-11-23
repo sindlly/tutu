@@ -8,22 +8,26 @@
 ```
 小程序 / H5 客户端
    │
-   ├─ 业务接口(上传/批改/任务/积分) ──→ http://www.zycquet.com/tutu/... ──nginx──→ 127.0.0.1:8080 (api 容器)
+   ├─ 业务接口(上传/批改/任务/积分) ──→ http://www.zycquet.com/tutu/... ────nginx──→ 127.0.0.1:8080 (api 容器)
    │
-   └─ 图片预签名 URL(展示作业照/错题卡) ──→ http://www.zycquet.com:9000 ────────→  minio 容器
-                                                          (S3 签名含 Host，必须直连，见下文)
+   └─ 图片预签名 URL(展示作业照/错题卡) ──→ http://www.zycquet.com/homework-grader/...
+                                                       └──nginx 原样透传──→ 127.0.0.1:9000 (minio 容器)
 
 docker compose 内部网络：
   api ──→ mysql:3306 / redis:6379 / minio:9000   (容器内用服务名互访，不占宿主机端口)
+
+（开发环境保持现状：本机 MinIO 直连 + presign 地址 http://127.0.0.1:9002，不受本方案影响）
 ```
 
 **两个关键设计点：**
 
 1. **API 走 `/tutu` 前缀，nginx 负责剥掉前缀**。后端本身没有 context-path，
    接口实际路径是 `/api/v1/...`，所以 `http://www.zycquet.com/tutu/api/v1/health` 会转发成 `/api/v1/health`。
-2. **MinIO 不能挂在 `/tutu/xxx` 子路径下**。S3 预签名把**路径**也计入签名，
-   nginx 剥前缀后 MinIO 校验的路径与签名不一致会直接 403。所以图片读取用「同域名不同端口」直通（方案 A），
-   将来上 https 时再切独立子域名（方案 B）。
+2. **MinIO 预签名走 `/homework-grader/`（桶名）前缀，nginx 原样透传、绝不重写路径**。
+   MinIO SDK 生成的是路径风格 URL（`{presign-endpoint}/{桶}/{key}?X-Amz-...`），
+   S3 签名把路径计入签名——只要 nginx 不剥前缀，MinIO 收到的路径与签名一致即可通过校验。
+   因此 `.env` 里 `MINIO_PRESIGN_ENDPOINT=http://www.zycquet.com`（不带端口、不带路径），
+   9000 端口不需要对公网开放。将来上 https 也只需把它改成 `https://www.zycquet.com`，不用换域名。
 
 ## 二、服务器准备
 
@@ -33,9 +37,8 @@ curl -fsSL https://get.docker.com | sh
 sudo systemctl enable --now docker
 
 # 2. 安全组 / 防火墙开放端口
-#    80    → nginx（对外入口，必须）
-#    9000  → MinIO 预签名 URL 直通（必须，见方案 A）
-#    3306 / 6379 / 8080 → 不要对公网开放！
+#    80    → nginx（对外入口，API 和图片预签名都走它，必须）
+#    3306 / 6379 / 8080 / 9000 → 不要对公网开放！（图片走 nginx 80 代理，9000 只留本机）
 ```
 
 ## 三、上传代码
@@ -74,8 +77,8 @@ STORAGE_PROVIDER=minio
 MINIO_ACCESS_KEY=<自定一个 accessKey>
 MINIO_SECRET_KEY=<自定一个强 secretKey>
 MINIO_BUCKET=homework-grader
-# 预签名对外地址：Host 参与签名，必须是「客户端可达」的地址（方案 A：同域名 9000 端口）
-MINIO_PRESIGN_ENDPOINT=http://www.zycquet.com:9000
+# 预签名对外地址：走 nginx 80 的桶名前缀路径（SDK 会拼成 http://www.zycquet.com/homework-grader/{key}）
+MINIO_PRESIGN_ENDPOINT=http://www.zycquet.com
 
 # ---- 批改模型（必填，否则提交批改会失败）----
 DEEPSEEK_API_KEY=<你的 DeepSeek key>
@@ -106,8 +109,8 @@ chmod 600 .env
 export MYSQL_PORT=3306 REDIS_PORT=6379 MINIO_PORT=9000 MINIO_CONSOLE_PORT=9001
 ```
 
-**安全加固（强烈建议直接改文件）**：MySQL/Redis/API 只给本机 nginx 用，
-端口映射都绑到 `127.0.0.1`，公网完全摸不到；只有 MinIO 需要对公网开放：
+**安全加固（强烈建议直接改文件）**：MySQL/Redis/API/MinIO 全部只给本机 nginx 用，
+端口映射都绑到 `127.0.0.1`，公网只暴露 nginx 的 80：
 
 ```yaml
   mysql:
@@ -118,7 +121,7 @@ export MYSQL_PORT=3306 REDIS_PORT=6379 MINIO_PORT=9000 MINIO_CONSOLE_PORT=9001
       - "127.0.0.1:6379:6379"      # 改：只绑本机
   minio:
     ports:
-      - "9000:9000"                # 保持：预签名要公网可达
+      - "127.0.0.1:9000:9000"      # 改：图片走 nginx 80 代理，9000 不对公网开放
       - "127.0.0.1:9001:9001"      # 改：控制台只绑本机
   api:
     ports:
@@ -137,16 +140,15 @@ docker compose logs -f api # 首次启动 Flyway 会自动建表（V1~V8 全量�
 
 ## 六、nginx 配置
 
-`/etc/nginx/conf.d/tutu.conf`（或加进现有 server 块）：
+服务器上已有 nginx 在跑网站（`www.zycquet.com` 的 80 端口），**把下面两个 location 加进现有的那个 server 块**（别新建 server，会抢 `server_name`）：
 
 ```nginx
-server {
-    listen 80;
-    server_name www.zycquet.com;
+# ---- 加在现有 server { listen 80; server_name www.zycquet.com; ... } 里 ----
 
-    client_max_body_size 25m;      # 上传接口上限 20MB，留点余量
+    client_max_body_size 25m;      # 上传接口上限 20MB，留点余量（加在 server 层）
 
-    # 业务 API：/tutu/xxx → 127.0.0.1:8080/xxx（注意 proxy_pass 结尾的 / 会剥掉 /tutu 前缀）
+    # 1) 业务 API：/tutu/xxx → 127.0.0.1:8080/xxx
+    #    注意 proxy_pass 结尾的 / 会剥掉 /tutu 前缀
     location /tutu/ {
         proxy_pass http://127.0.0.1:8080/;
         proxy_set_header Host $host;
@@ -155,13 +157,17 @@ server {
         proxy_read_timeout 200s;   # 批改接口最长 180s，别让 nginx 先掐断
     }
 
-    # MinIO 预签名直通（方案 A）：只转发不重写路径，S3 签名才对得上
-    location / {
+    # 2) MinIO 图片预签名：/homework-grader/{key} → 127.0.0.1:9000/homework-grader/{key}
+    #    关键：proxy_pass 后面【不带路径、不带斜杠】，nginx 才会原样透传 URI；
+    #    S3 签名包含路径，一旦重写（加 / 或改写）MinIO 校验必 403。
+    #    前缀必须等于桶名（MINIO_BUCKET=homework-grader），换桶名要同步改这里。
+    location /homework-grader/ {
         proxy_pass http://127.0.0.1:9000;
-        proxy_set_header Host $http_host;   # 必须原样传 Host，参与签名
+        proxy_set_header Host $http_host;   # Host 参与签名，必须原样透传，不能改成 $proxy_host
     }
-}
 ```
+
+改完执行 `sudo nginx -t && sudo systemctl reload nginx`。
 
 ```bash
 sudo nginx -t && sudo systemctl reload nginx
@@ -173,8 +179,11 @@ sudo nginx -t && sudo systemctl reload nginx
 # 1. 健康检查（应返回 JSON，code=0）
 curl http://www.zycquet.com/tutu/api/v1/health
 
-# 2. MinIO 直通
-curl -I http://www.zycquet.com:9000/minio/health/live   # 200
+# 2. MinIO 图片路径走 nginx（在小程序里打开一张作业照/错题卡，图片能显示即通）
+#    后端返回的预签名地址应形如 http://www.zycquet.com/homework-grader/xxx?X-Amz-...
+#    也可直接拿一条预签名 URL 来 curl：
+curl -I 'http://www.zycquet.com/homework-grader/<key>?X-Amz-...'   # 200
+#    （403 = 签名没对上，多半是 proxy_pass 写成了带 / 的形式或 Host 被改写）
 
 # 3. 小程序联调（API 地址是编译期注入的，不用改源码）
 #    - 线上模式编译：npm run build:weapp:online   （或 dev:weapp:online 带监听）
@@ -186,12 +195,11 @@ curl -I http://www.zycquet.com:9000/minio/health/live   # 200
 
 **上线前必须做（微信硬性要求）**：
 - 小程序正式版 request/downloadFile 合法域名**只接受 https**。
-  需要给 `www.zycquet.com` 配 TLS 证书（Let's Encrypt 免费即可），
-  并把 MinIO 切到独立子域名（方案 B）：`files.zycquet.com` 也配证书，
-  `.env` 里 `MINIO_PRESIGN_ENDPOINT=https://files.zycquet.com`，
-  nginx 对两个域名各自 `proxy_pass`（仍然不能重写路径）。
-- 在微信公众平台 → 开发管理 → 服务器域名，添加 `https://www.zycquet.com`（request/uploadFile）
-  和 `https://files.zycquet.com`（downloadFile）。
+  给 `www.zycquet.com` 配 TLS 证书（Let's Encrypt 免费即可），nginx 把上面两个 location 挪进 443 的
+  server 块，`.env` 里 `MINIO_PRESIGN_ENDPOINT` 改成 `https://www.zycquet.com` 后
+  `docker compose up -d api` 重建。图片和 API 同域名，**不需要**额外的 files 子域名。
+- 在微信公众平台 → 开发管理 → 服务器域名，添加 `https://www.zycquet.com`
+  （request/uploadFile/downloadFile 三类都勾上）。
 
 ## 八、日常运维
 
@@ -211,5 +219,5 @@ tar czf /backup/tutu-$(date +%F).tgz data/docker/mysql data/docker/minio
 1. `.env` 权限 600，永不提交 git（`.gitignore` 已排除）
 2. MySQL/Redis/API 端口只绑 `127.0.0.1`（第五节已做）
 3. Redis 加密码：`.env` 加 `REDIS_PASSWORD`，compose 里 redis 加 `command: redis-server --requirepass ${REDIS_PASSWORD}`
-4. 上 https（方案 B）后再提审小程序
+4. 上 https（见第七节）后再提审小程序
 5. 后续补：微信内容安全审核（imgSecCheck/msgSecCheck）、用户数据删除入口（未成年人合规）

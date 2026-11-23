@@ -17,7 +17,7 @@ export default defineAppConfig({
   window: {
     backgroundTextStyle: 'dark',
     navigationBarBackgroundColor: '#f5f4ed',
-    navigationBarTitleText: '拍照批改',
+    navigationBarTitleText: '每天进步一点点',
     navigationBarTextStyle: 'black',
     backgroundColor: '#f5f4ed',
   },

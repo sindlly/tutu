@@ -2,31 +2,9 @@
   padding-bottom: 40px;
 }
 
-/* 看板头部：小标语 + 大标题 + 孩子胶囊（右侧） */
+/* 看板头部：每日美句（孩子胶囊已挪进资产卡） */
 .hero {
   padding: 8px 4px 28px;
-}
-
-.hero-eyebrow {
-  font-size: 24px;
-  color: #87867f;
-  letter-spacing: 1px;
-}
-
-.hero-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 10px;
-}
-
-.hero-title {
-  font-size: 56px;
-  font-weight: 600;
-  letter-spacing: 2px;
-  line-height: 1.1;
-  /* 衬线书名感（Anthropic Serif → 宋体栈） */
-  font-family: "Songti SC", "STSong", "Noto Serif SC", Georgia, serif;
 }
 
 .hero-quote {
@@ -35,25 +13,6 @@
   line-height: 1.6;
   color: rgba(20, 20, 19, 0.62);
   font-family: "Songti SC", "STSong", "Noto Serif SC", Georgia, serif;
-}
-
-.hero-pill {
-  background: rgba(255, 255, 255, 0.62);
-  border: 1px solid rgba(255, 255, 255, 0.9);
-  border-radius: 999px;
-  padding: 10px 26px;
-  font-size: 26px;
-  font-weight: 500;
-  color: rgba(20, 20, 19, 0.62);
-  backdrop-filter: blur(20px) saturate(1.3);
-  -webkit-backdrop-filter: blur(20px) saturate(1.3);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
-  transition: all 0.18s ease;
-
-  &:active {
-    border-color: #c96442;
-    transform: scale(0.97);
-  }
 }
 
 /* 资产卡：薄荷玻璃 + 微旋转 -0.6°——像随手贴上去的便签（整卡可点） */
@@ -68,19 +27,40 @@
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.9),
     0 12px 32px rgba(78, 122, 64, 0.12);
-  transform: rotate(-0.6deg);
   transition: all 0.18s ease;
 
   &:active {
     background: rgba(221, 245, 232, 0.85);
-    transform: rotate(-0.6deg) scale(0.98);
+    transform: scale(0.98);
   }
 }
 
-.asset-label {
-  font-size: 24px;
+/* 孩子胶囊（原头部胶囊挪进资产卡右上角，点击切换孩子） */
+.asset-head {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.asset-pill {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 999px;
+  padding: 10px 26px;
+  font-size: 26px;
+  font-weight: 500;
   /* 字阶靠透明度：薄荷底上的墨绿说明字 62% */
-  color: rgba(47, 92, 70, 0.62);
+  color: rgba(47, 92, 70, 0.72);
+  backdrop-filter: blur(20px) saturate(1.3);
+  -webkit-backdrop-filter: blur(20px) saturate(1.3);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  transition: all 0.18s ease;
+
+  &:active {
+    border-color: #c96442;
+    color: #c96442;
+    transform: scale(0.97);
+  }
 }
 
 .asset-main {
@@ -253,7 +233,6 @@
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.9),
     0 12px 32px rgba(201, 100, 66, 0.18);
-  transform: rotate(0.6deg);
   transition: all 0.18s ease;
 
   &:active {

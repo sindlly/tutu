@@ -15,7 +15,7 @@ import './index.scss'
 
 /**
  * 首页 = 全局看板与入口：孩子资产（积分）、今日任务快览、拍照批改主行动、最近批改。
- * 参考看板式布局：大标题头部 → 资产大卡 → 任务区 → 行动横幅 → 列表。
+ * 参考看板式布局：小标语头部 → 资产大卡（含孩子胶囊） → 任务区 → 行动横幅 → 列表。
  */
 export default function Index() {
   const [quota, setQuota] = useState<QuotaVo | null>(null)
@@ -111,26 +111,26 @@ export default function Index() {
 
   return (
     <View className="page index">
-      {/* 看板头部：小标语 + 大标题 + 孩子胶囊 + 每日美句 */}
+      {/* 看板头部：每日美句（孩子胶囊挪进下面的资产卡） */}
       <View className="hero">
-        <View className="hero-eyebrow">轻松辅导，从拍照开始</View>
-        <View className="hero-row">
-          <View className="hero-title">拍照改作业</View>
-          <View
-            className="hero-pill"
-            onClick={() => Taro.navigateTo({ url: '/pages/children/children' })}
-          >
-            {student ? student.name : '选孩子'}
-            {studentCount > 1 ? ' ›' : ''}
-          </View>
-        </View>
         {quote?.text && <View className="hero-quote">{quote.text}</View>}
       </View>
 
-      {/* 资产卡：孩子的积分 */}
+      {/* 资产卡：孩子的积分（头部胶囊 = 切换孩子入口） */}
       {s && (
         <View className="asset-card" onClick={() => student && Taro.navigateTo({ url: `/pages/points/points?studentId=${student.id}` })}>
-          <View className="asset-label">{student?.name ?? '宝贝'}的积分</View>
+          <View className="asset-head">
+            <View
+              className="asset-pill"
+              onClick={(e) => {
+                e.stopPropagation()
+                Taro.navigateTo({ url: '/pages/children/children' })
+              }}
+            >
+              {student ? student.name : '选孩子'}
+              {studentCount > 1 ? ' ›' : ''}
+            </View>
+          </View>
           <View className="asset-main">
             <Text className="asset-num">{s.balance}</Text>
             <Text className="asset-unit">分</Text>
